@@ -1,0 +1,9 @@
+
+Following configuration(s) were tested:
+
+Version  OS						boot dev
+
+0.1	 Debain 4.0					iSCSI Enterprise Target
+	 Xen-3.2 and kernel from xen.org		
+	 Guest System
+
