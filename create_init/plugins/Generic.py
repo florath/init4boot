@@ -120,6 +120,10 @@ for x in $(cat /proc/cmdline); do
     verbose=*)
            clp_verbose=`istrue ${x#verbose=}`
            ;;
+""")
+                
+            def post_output(self, ofile):
+                ofile.write("""
     # The following parameters are known to exists and
     # they are evaluated during kernel startup.
     console=*)
