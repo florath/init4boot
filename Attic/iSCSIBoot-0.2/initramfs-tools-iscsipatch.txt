@@ -1,0 +1,87 @@
+diff -u -r initramfs-tools/init initramfs-tools-multiple-netdevs/init
+--- initramfs-tools/init	2008-01-22 16:36:28.000000000 +0100
++++ initramfs-tools-multiple-netdevs/init	2008-02-19 17:11:01.000000000 +0100
+@@ -31,6 +31,7 @@
+ export ROOT=
+ 
+ # Bring in the main config
++export NETWORK_DEVICES=
+ . /conf/initramfs.conf
+ for conf in conf/conf.d/*; do
+ 	[ -f ${conf} ] && . ${conf}
+@@ -50,6 +51,9 @@
+ export ROOTDELAY=
+ export panic=
+ export blacklist=
++export IPOPTS=
++export BOOT_TYPE=unknown
++export BOOT_ARGS=
+ 
+ # Parse command line options
+ for x in $(cat /proc/cmdline); do
+@@ -88,6 +92,23 @@
+ 	nfsroot=*)
+ 		NFSROOT="${x#nfsroot=}"
+ 		;;
++	rfs=*)
++		RFS="${x#rfs=}"
++		case $RFS in
++    			iscsi:*)
++				BOOT_TYPE=iscsi
++				BOOT_ARGS=${rfs#iscsi:}
++				# Compatibility mode :-)
++				eval $BOOT_ARGS
++				ROOT=${path}
++				BOOT=local
++				readonly=n
++				;;
++			*)
++				echo "Invalid boot type - ignoring rfs= setting"
++				;;
++		esac
++		;;
+ 	ip=*)
+ 		IPOPTS="${x#ip=}"
+ 		;;
+diff -u -r initramfs-tools/scripts/functions initramfs-tools-multiple-netdevs/scripts/functions
+--- initramfs-tools/scripts/functions	2008-02-19 17:49:54.000000000 +0100
++++ initramfs-tools-multiple-netdevs/scripts/functions	2008-02-19 17:50:26.000000000 +0100
+@@ -279,11 +279,15 @@
+ 		# Do nothing
+ 		;;
+ 	""|on|any)
+-		# Bring up device
+-		ipconfig ${DEVICE}
++		# Bring up devices
++		for NWDEV in ${NETWORK_DEVICES}; do
++			ipconfig ${NWDEV}
++		done
+ 		;;
+ 	dhcp|bootp|rarp|both)
+-		ipconfig -c ${IPOPTS} -d ${DEVICE}
++		for NWDEV in ${NETWORK_DEVICES}; do
++			ipconfig -c ${IPOPTS} -d ${NWDEV}
++		done
+ 		;;
+ 	*)
+ 		ipconfig -d $IPOPTS
+@@ -301,7 +305,4 @@
+ 		fi
+ 		;;
+ 	esac
+-
+-	# source relevant ipconfig output
+-	. /tmp/net-${DEVICE}.conf
+ }
+diff -u -r initramfs-tools/scripts/nfs initramfs-tools-multiple-netdevs/scripts/nfs
+--- initramfs-tools/scripts/nfs	2008-01-22 16:36:28.000000000 +0100
++++ initramfs-tools-multiple-netdevs/scripts/nfs	2008-02-19 17:51:04.000000000 +0100
+@@ -9,6 +9,8 @@
+ {
+ 
+ 	configure_networking
++       # source relevant ipconfig output
++       . /tmp/net-${NETWORK_DEVICES}.conf
+ 
+ 	# get nfs root from dhcp
+ 	if [ "x${NFSROOT}" = "xauto" ]; then

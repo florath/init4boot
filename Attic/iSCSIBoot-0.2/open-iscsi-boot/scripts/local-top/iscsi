@@ -1,0 +1,83 @@
+#!/bin/sh
+
+PREREQ="udev multipath"
+
+prereqs() { echo "$PREREQ"; }
+
+case $1 in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+
+if [ ! -e /sbin/iscsid ]; then
+	exit 0
+fi
+
+if [ "xiscsi" != "x${BOOT_TYPE}" ]; then
+	exit 0
+fi
+
+. /scripts/functions
+
+# For DHCP
+modprobe af_packet
+
+# Set up the network
+configure_networking
+
+modprobe -q iscsi_tcp
+
+# Eval parameters
+eval $BOOT_ARGS
+
+[ "$quiet" != "y" ] && log_begin_msg "Starting iscsid"
+mkdir -p /etc/iscsi
+echo "InitiatorName=$localiqn" >/etc/iscsi/initiatorname.iscsi
+# Remove possible old data
+rm -fr /etc/iscsi/nodes/* /etc/iscsi/send_targets/*
+# Start iscsid with -f which logs to stdout / stderr instead of
+# syslog (which is not available at this time).
+/sbin/iscsid -d 0 -f >/tmp/iscsid-stdout.log 2>/tmp/iscsid-stderr.log &
+echo $! >/etc/iscsi/iscsid.pid
+[ "$quiet" != "y" ] && log_end_msg
+
+[ "$quiet" != "y" ] && log_begin_msg "Login at all detected targets"
+ONE_PORTAL_REACHED=false
+for portal in `echo $portals | tr "," " "` ; do 
+        ALLTARGETS=`iscsiadm -m discovery -t sendtargets -p $portal | tr " " "%"` 
+        if [ $? -eq 0 ] ; 
+        then 
+		ONE_PORTAL_REACHED=true
+                break 
+        fi 
+done
+
+if [ "false" = "${ONE_PORTAL_REACHED}" ]; then
+	panic "No iSCSI portal reachable"
+fi
+
+for ATS in ${ALLTARGETS}; do
+	TARGET=${ATS#*%*}
+	PORT=${ATS%*%*}
+	iscsiadm -m node -T $TARGET -p $PORT -l
+done
+[ "$quiet" != "y" ] && log_end_msg
+
+if [ -e /sbin/multipath ]; then
+	[ "$quiet" != "y" ] && log_begin_msg "Handling multipath"
+	# Multipath needs in some situations more than one run
+	for i in 1 2 3 ; do
+		/sbin/multipath
+		sleep 1
+		/sbin/multipath -ll
+	done
+
+	/sbin/kpartx -a ${path}
+	[ "$quiet" != "y" ] && log_end_msg
+fi
+
+exit 0
+

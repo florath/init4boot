@@ -1,0 +1,39 @@
+#!/bin/sh
+PREREQ=""
+prereqs()
+{
+    echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+   prereqs
+   exit 0
+   ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+copy_exec /usr/sbin/iscsid /sbin
+copy_exec /usr/bin/iscsiadm /bin
+
+# The password file is needed.
+# (If not, the error 'peeruser_unix: unknown local user with uid 0'
+# occurs.)
+echo "root:x:0:0:root:/root:/bin/bash" >${DESTDIR}/etc/passwd
+for l in /lib/libnss_*;
+do
+        cp $l ${DESTDIR}/$l
+done
+
+# Copy over the local config
+# (Use this to specify e.g. needed usernames/passwords)
+mkdir -p ${DESTDIR}/etc/iscsi
+cp /etc/iscsi/iscsid.conf ${DESTDIR}/etc/iscsi/iscsid.conf
+
+cp /etc/iscsi.conf ${DESTDIR}/etc/iscsi.conf
+
+# Copy modules
+for x in iscsi_tcp ; do
+        manual_add_modules ${x}
+done

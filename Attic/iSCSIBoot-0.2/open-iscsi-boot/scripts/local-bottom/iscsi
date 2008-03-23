@@ -1,0 +1,19 @@
+#!/bin/sh
+
+PREREQ=""
+
+prereqs() { echo "$PREREQ"; }
+
+case $1 in
+prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+echo "Copy over iSCSI configuration"
+rm -fr ${rootmnt}/etc/iscsi
+mkdir -p ${rootmnt}/etc/iscsi
+cp -a /etc/iscsi ${rootmnt}/etc
+
+
