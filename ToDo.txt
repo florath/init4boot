@@ -1,0 +1,2 @@
+
+* Need to fsck before mount root?
