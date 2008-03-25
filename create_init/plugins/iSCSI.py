@@ -1,7 +1,7 @@
 #
 # init4boot iSCSI plugin
 #
-# (c) 2008 by flonatel GmbH & Co. KG
+# (c) 2008 by flonatel
 #
 # For licencing details see COPYING
 #
@@ -20,6 +20,7 @@ class iSCSI:
   iscsi:*)
     boot_type="iscsi"
     boot_args=${clp_rfs#iscsi:}
+    bv_deps="${bv_deps} network"
     ;;
 """)
         return CommandLineEvaluation()

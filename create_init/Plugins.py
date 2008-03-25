@@ -25,8 +25,8 @@ class Plugins:
             if not filename.endswith(".py"):
                 continue
             modulename = filename[:-3]
-            
-            print "Found module '%s'. Importing..." % modulename
+
+            print "Importing module '%s'" % modulename
             module = __import__(modulename)
 
             o = eval("module.%s(self.config)" % modulename)
@@ -34,11 +34,7 @@ class Plugins:
             for stage in xrange(0, I4BPhases.TheEnd):
                 fname = "go_%s" % I4BPhases.Desc[stage][0]
                 if fname not in dir(o):
-                    print "... skipping method '%s'" % fname
                     continue
                 pplug = eval("o." + fname + "()")
-                print "+++++++++++++++++*"
-                print pplug
                 self.plugins[stage][modulename] = pplug
-                print self.plugins[stage]
 

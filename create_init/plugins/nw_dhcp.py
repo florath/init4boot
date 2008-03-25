@@ -13,6 +13,8 @@ class nw_dhcp:
 
     def go_SetupLowLevelTransport(self):
 
+        # XXX Add dep to network
+
         class SetupLowLevelTransport:
 
             def output(self, ofile):

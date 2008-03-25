@@ -36,6 +36,8 @@ class Generic:
             def pre_output(self, ofile):
                 ofile.write("""
 verbose=1
+break="never"
+clp_bv=""
 log()
 {
   [ "${verbose}" = "0" ] && return
@@ -46,11 +48,11 @@ phasecnt=0
 logp()
 {
   phasecnt=$((${phasecnt} + 1))
-  log "+++ Phase $phasecnt start +++ $@"
+  log "+++ Phase $phasecnt: $@"
 }
 logpe()
 {
-  log "+++ Phase $phasecnt end   +++"
+  log "--- Phase $phasecnt"
 }
 istrue()
 {
@@ -63,6 +65,7 @@ istrue()
 }
 panic()
 {
+  [ -n "${1}" ] && echo "PANIC: ${1}"
   PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 # Parameter: device node to check
@@ -75,16 +78,29 @@ get_fstype ()
   # vol_id has a more complete list of file systems,
   # but fstype is more robust
   eval $(fstype "${fs}" 2> /dev/null)
-  if [ "$fstype" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
-    fstype=$(/lib/udev/vol_id -t "${fs}" 2> /dev/null)
+  if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
+    FSTYPE=$(/lib/udev/vol_id -t "${fs}" 2> /dev/null)
   fi
   ret=$?
 
-  if [ -z "${fstype}" ]; then
-    fstype="unknown"
+  if [ -z "${FSTYPE}" ]; then
+    FSTYPE="unknown"
   fi
-  echo "${fstype}"
+  echo "${FSTYPE}"
   return ${ret}
+}
+maybe_break()
+{
+        if [ "${break}" = "$1" ]; then
+                panic "Spawning shell within the initramfs (Phase ${break})"
+        fi
+}
+check_bv()
+{
+    for m in ${clp_bv}; do
+	[ "${m}" = "${1}" ] && return 0
+    done
+    return 1
 }
 
 # Global variables
@@ -105,6 +121,12 @@ log "Starting up system from initramfs."
 mount -t proc -o nodev,noexec,nosuid none /proc
 for x in $(cat /proc/cmdline); do
   case ${x} in
+    break=*)
+           clp_break=${x#break=}
+           ;;
+    bv=*)
+           clp_bv=`echo ${x#bv=} | tr "," " "`
+           ;;
     debug=*)
            clp_debug=`istrue ${x#debug=}`
            ;;
@@ -133,7 +155,6 @@ for x in $(cat /proc/cmdline); do
            ;;
   esac
 done
-logpe
 """)
 
         return CommandLineParsing()
@@ -145,6 +166,7 @@ logpe
                 ofile.write("""
 [ "${clp_verbose}" = "1" ] && verbose = 1
 [ "${clp_debug}" = "1" ] && exec >/tmp/initramfs.debug 2>&1 && set -x
+[ -n "${clp_break}" ] && break=${clp_break}
 """)
         return CommandLineVerbose()
 
@@ -188,6 +210,9 @@ case ${clp_rfs} in
     log "Ignoring unknown boot type '${clp_rfs}'"
     ;;
 esac
+# Append additional (automatic generated) dependencies
+clp_bv="${clp_bv} ${bv_deps}"
+log "Boot variant(s) (manual plus automatic): '${clp_bv}'"
 logpe
 """)
         return CommandLineEvaluation()
@@ -240,7 +265,7 @@ fi
 
 # We've given up, but we'll let the user fix matters if they can
 while [ ! -e "${path}" ]; do
-  echo "ALERT!  ${pathT} does not exist.  Dropping to a shell!"
+  echo "ALERT!  ${path} does not exist.  Dropping to a shell!"
   echo "  Check your root= boot argument (cat /proc/cmdline)"
   panic " Check for missing modules (cat /proc/modules), or device files (ls /dev)"
 done
@@ -318,3 +343,5 @@ panic "Could not execute run-init."
 """)
 
         return RunInit()
+
+            

@@ -17,22 +17,24 @@ class network:
 
             def pre_output(self, ofile):
                 ofile.write("""
-logp "Handling network"
+if check_bv "network"; then
+  logp "Handling network"
 
-for nwdev in `echo ${clp_nw} | tr "," " "`; do
-   device=${nwdev%:*}
-   mepa=${nwdev#*:}
+  for nwdev in `echo ${clp_nw} | tr "," " "`; do
+    device=${nwdev%:*}
+    mepa=${nwdev#*:}
 
-   case ${mepa} in
+    case ${mepa} in
 """)
 
             def post_output(self, ofile):
                 ofile.write("""
-     *)
-       log "Ignoring unknown network parameter: ${mepa}"
-       ;;
-   esac
-done
-logpe
+      *)
+        log "Ignoring unknown network parameter: ${mepa}"
+        ;;
+    esac
+  done
+  logpe
+fi
 """)
         return SetupLowLevelTransport()
