@@ -4,7 +4,7 @@
 # Creates an initrd from a given set of configuration parameters and
 # uses the system wide installed eirt modules.
 #
-# (c) 2008 by flonatel GmbH & Co. KG
+# (c) 2008 by flonatel
 #
 # For licencing details see COPYING
 #
@@ -17,7 +17,8 @@ def main():
     dc = DataCollector()
     dc.collect()
 
-    plugins = Plugins("plugins", dc.data)
+    ## XXX DIRTY HACK!
+    plugins = Plugins("../create_init/plugins", dc.data)
     plugins.load()
     
     iw = InitWriter(dc.data, plugins.plugins)

@@ -1,2 +1,6 @@
 
 * Need to fsck before mount root?
+
+* Add to doc: No program is executed - because it is possible that the
+  system is different.
+

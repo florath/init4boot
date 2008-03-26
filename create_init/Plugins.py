@@ -3,7 +3,7 @@
 #
 # Handle loading of plugins
 #
-# (c) 2008 by flonatel GmbH & Co. KG
+# (c) 2008 by flonatel
 #
 # For licencing details see COPYING
 #
