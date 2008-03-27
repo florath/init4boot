@@ -1,7 +1,7 @@
 #
-# (c) 2008 by flonatel GmbH & Co. KG
+# (c) 2008 by flonatel
 #
-# For licencing details see COPYING
+# For licensing details see COPYING
 #
 
 #

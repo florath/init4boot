@@ -6,6 +6,8 @@
 # For licencing details see COPYING
 #
 
+import os
+
 class multipath:
     
     def __init__(self, config):
@@ -22,18 +24,20 @@ class multipath:
             def output(self, ofile):
                 ofile.write("""
 if check_bv "multipath"; then
+  maybe_break multipath
   logp "Handling multipath"
 
-  if [ -e /sbin/multipath ]; then
+  if [ -e /bin/multipath ]; then
 
     modprobe dm-multipath
     modprobe dm-emc
+    modprobe dm-round-robin
 
     # Multipath needs in some situations more than one run
     for i in 1 2 3 ; do
-      /sbin/multipath
+      /bin/multipath
       sleep 1
-      /sbin/multipath -ll
+      /bin/multipath -ll
     done
 
     log "Accessing all disk once to get the state corrected"
@@ -53,7 +57,7 @@ if check_bv "multipath"; then
     for disk in /dev/mapper/*; do
       [ "${disk}" = "/dev/mapper/control" ] && continue
       log "... ${disk}"
-      /sbin/kpartx -a ${disk}
+      /bin/kpartx -a ${disk}
     done
 
   else
@@ -76,3 +80,27 @@ if check_bv "multipath" ; then
 fi
 """)
         return CommandLineEvaluation()
+
+
+# ======================================================================
+# === Create hooks
+
+    def mi_Copy(self):
+
+        class Copy:
+            def output(self, c):
+                c.copy("sbin/multipath", "bin")
+                c.copy("sbin/kpartx", "bin")
+                c.copy("sbin/devmap_name", "bin")
+                c.copy("sbin/dmsetup", "bin")
+                c.copy("lib/udev/dmsetup_env", "lib/udev")
+                c.copy("sbin/mpath_prio_alua", "bin")
+                c.copy("sbin/mpath_prio_emc", "bin")
+                c.copy("sbin/mpath_prio_hp_sw", "bin")
+                c.copy("sbin/mpath_prio_rdac", "bin")
+                c.copy("sbin/mpath_prio_netapp", "bin")
+                c.copy("sbin/mpath_prio_random", "bin")
+                c.copy("sbin/mpath_prio_hds_modular", "bin")
+                c.copy("sbin/mpath_prio_balance_units", "bin")
+
+        return Copy()

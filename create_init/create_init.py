@@ -6,7 +6,7 @@
 #
 # (c) 2008 by flonatel
 #
-# For licencing details see COPYING
+# For licensing details see COPYING
 #
 
 from InitWriter import InitWriter

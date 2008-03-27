@@ -1,12 +1,16 @@
 #
 # This is the generic part - also implemented as a plugin
 #
-# (c) 2008 by flonatel GmbH & Co. KG
+# (c) 2008 by flonatel
 #
-# For licencing details see COPYING
+# For licensing details see COPYING
 #
 
 import time
+import os
+import shutil
+import re
+import CreateInit.CreateInit
 
 class Generic:
 
@@ -48,11 +52,16 @@ phasecnt=0
 logp()
 {
   phasecnt=$((${phasecnt} + 1))
-  log "+++ Phase $phasecnt: $@"
+  log "+ $@"
 }
 logpe()
 {
-  log "--- Phase $phasecnt"
+   echo " " >/dev/null
+#  log "- $phasecnt"
+}
+lognp()
+{
+  log "+++ Phase ${1} +++"
 }
 istrue()
 {
@@ -130,6 +139,9 @@ for x in $(cat /proc/cmdline); do
     debug=*)
            clp_debug=`istrue ${x#debug=}`
            ;;
+    hostid=*)
+           clp_hostid=${x#hostid=}
+           ;;
     init=*)
            clp_init=${x#init=}
            ;;
@@ -178,8 +190,6 @@ done
             
             def pre_output(self, ofile):
                 ofile.write("""
-logp "Setting up system devs for boot"
-
 [ -d /dev ] || mkdir -m 0755 /dev
 [ -d /root ] || mkdir --mode=0700 /root
 [ -d /sys ] || mkdir /sys
@@ -189,7 +199,6 @@ mount -t sysfs -o nodev,noexec,nosuid none /sys
 mount -t tmpfs -o size=%s,mode=0755 udev /dev
 [ -e /dev/console ] || mknod /dev/console c 5 1
 [ -e /dev/null ] || mknod /dev/null c 1 3
-logpe
 """ % self.config["tmpfs_size"])
 
         return InitialSystemSetup(self.config)
@@ -200,7 +209,6 @@ logpe
         class CommandLineEvaluation:
             def pre_output(self, ofile):
                 ofile.write("""
-logp "Evaluating command line options"
 case ${clp_rfs} in
 """)
 
@@ -213,7 +221,6 @@ esac
 # Append additional (automatic generated) dependencies
 clp_bv="${clp_bv} ${bv_deps}"
 log "Boot variant(s) (manual plus automatic): '${clp_bv}'"
-logpe
 """)
         return CommandLineEvaluation()
 
@@ -222,9 +229,7 @@ logpe
         class HandleInitialModuleSetup:
             def pre_output(self, ofile):
                 ofile.write("""
-logp "Handling Modules"
 depmod -a
-logpe
 """)
                 
         return HandleInitialModuleSetup()
@@ -234,7 +239,6 @@ logpe
         class MountRoot:
             def pre_output(self, ofile):
                 ofile.write("""
-logp "Mounting root file system"
 # If the root device hasn't shown up yet, give it a little while
 # to deal with removable devices
 if [ ! -e "${path}" ] || ! $(get_fstype "${path}" >/dev/null); then
@@ -289,7 +293,6 @@ modprobe ${fstype}
 # FIXME This has no error checking
 # Mount root
 mount ${roflag} -t ${fstype} ${clp_rootflags} ${path} ${rootmnt}
-logpe
 """)
         return MountRoot()
 
@@ -298,7 +301,6 @@ logpe
         class CheckForInit:
             def pre_output(self, ofile):
                 ofile.write("""
-logp "Post mount setup"
 # Move virtual filesystems over to the real filesystem
 mount -n -o move /sys ${rootmnt}/sys
 mount -n -o move /proc ${rootmnt}/proc
@@ -336,7 +338,6 @@ if [ -n ${debug} ]; then
         unset debug
 fi
 
-logpe
 # Chain to real filesystem
 exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
 panic "Could not execute run-init."
@@ -345,3 +346,97 @@ panic "Could not execute run-init."
         return RunInit()
 
             
+# ======================================================================
+# === Create hooks
+
+    def mi_Copy(self):
+
+        class Copy:
+
+            # It is not possbile to call the ldd, because the executables
+            # might even not executed on the current system.  So the only
+            # way to do, is to copy all the libs over.
+            def copy_so_libs(self, c):
+                c.cpln("lib.*\.so.*", ["lib", "usr/lib", "lib64", ], "lib")
+
+            # Copy the /lib/ld* things
+            def copy_ldso(self, c):
+                c.cpln("ld.*", ["lib", "lib64"], "lib")
+
+            # Source is in root_dir, dest in tmp dir
+            def copy_exec(self, c, source):
+                dest = "bin"
+                if source[0] == "/":
+                    source = source[1:]
+                shutil.copy2(os.path.join(c.opts.root_dir, source),
+                             os.path.join(c.tmpdir, dest))
+
+            def create_sysdirs(self, c):
+                c.log("Creating subdirs")
+                # Note: the lib/modules and lib/firmware is automatically
+                #       generated when copying these.
+                for d in ["bin", "etc"]:
+                    dname = os.path.join(c.tmpdir, d)
+                    if not os.path.exists(dname):
+                        os.makedirs(dname)
+
+            def copy_modules(self, c):
+                c.log("Copy modules")
+                shutil.copytree(os.path.join(c.opts.root_dir, "lib/modules"),
+                                os.path.join(c.tmpdir, "lib/modules"), True)
+                c.log("Copy firmware")
+                shutil.copytree(os.path.join(c.opts.root_dir, "lib/firmware"),
+                                os.path.join(c.tmpdir, "lib/firmware"), True)
+
+            def copy_klibc(self, c):
+                c.log("Copy klibc binaries")
+                sdir = os.path.join(c.opts.root_dir, "usr/lib/klibc/bin")
+                for d in os.listdir(sdir):
+                    shutil.copy2(os.path.join(sdir, d),
+                                 os.path.join(c.tmpdir, "bin"))
+
+                c.log("Copy klibc libs")
+                sdir = os.path.join(c.opts.root_dir, "lib")
+                lre = re.compile("klibc-.*\.so")
+                for d in os.listdir(sdir):
+                    if lre.match(d):
+                        shutil.copy2(os.path.join(sdir, d),
+                                     os.path.join(c.tmpdir, "lib"))
+
+            def copy_busybox(self, c):
+                c.log("Copy busybox")
+                self.copy_exec(c, "/bin/busybox")
+                os.symlink("/bin/busybox",
+                           os.path.join(c.tmpdir, "bin/sh"))
+        
+            def output(self, c):
+                self.create_sysdirs(c)
+                self.copy_modules(c)
+                # Not sure about the klib things:
+                #  The problem is, that there are some programs that are
+                #  needed (e.g. run-init, fstype, ipconfig) that are
+                #  needed and not available with the some libc.
+                self.copy_klibc(c)
+
+                ci = CreateInit.CreateInit.CreateInit()
+                ci.run(os.path.join(c.tmpdir, "init"))
+
+                self.copy_so_libs(c)
+                self.copy_ldso(c)
+                self.copy_busybox(c)
+
+                c.log("Copy modutils")
+                self.copy_exec(c, "/sbin/modprobe")
+                self.copy_exec(c, "/sbin/depmod")
+                self.copy_exec(c, "/sbin/rmmod")
+
+                c.log("Creating cpio archive")
+                outfile = "initrd.img-" + c.opts.kernel_version
+                os.system("P=$PWD && cd %s &&  find . | " \
+                          "cpio --quiet -o -H newc | gzip >$P/%s"
+                          % (c.tmpdir, outfile))
+
+        return Copy()
+    
+
+    

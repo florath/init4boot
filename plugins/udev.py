@@ -69,4 +69,29 @@ fi
         return PrepareRootDir()
 
 
+# ======================================================================
+# === Create hooks
 
+    def mi_Copy(self):
+
+        class Copy:
+            def output(self, c):
+                # From udevhelper and udev
+                c.log("Copy hotplug.functions")
+                c.copy("lib/udev/hotplug.functions", "lib/udev")
+                c.log("Copy ide.agent")
+                c.copy("lib/udev/ide.agent", "lib/udev")
+                c.log("Copy *_id progs")
+                c.cpln(".*_id", ["lib/udev", ], "lib/udev")
+
+                # From udev only
+                c.log("Copy udef config files from etc")
+                c.copytree("etc/udev", "etc/udev")
+                # XXX Not existsing : c.copy("etc/scsi_id.config", "etc")
+                # WHY: rm -f $DESTDIR/etc/udev/rules.d/*_cd-aliases-generator.rules
+                c.log("Copy used binaries")
+                c.copy("sbin/udevd", "bin")
+                c.copy("sbin/udevtrigger", "bin")
+                c.copy("sbin/udevsettle", "bin")
+
+        return Copy()

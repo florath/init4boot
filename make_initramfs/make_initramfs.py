@@ -5,15 +5,15 @@
 #
 # (c) 2008 by flonatel
 #
-# For licencing details see COPYING
+# For licensing details see COPYING
 #
-from MakeInitramfs import MakeInitramfs
+from HandlePlugins import HandlePlugins
 from Options import Options
 
 def main():
     opts = Options()
     
-    mi = MakeInitramfs(opts.options)
+    mi = HandlePlugins(opts.options)
     mi.create_initramfs()
 
 if __name__ == "__main__":

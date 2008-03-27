@@ -6,6 +6,8 @@
 # For licencing details see COPYING
 #
 
+import os
+
 class iSCSI:
 
     def __init__(self, config):
@@ -34,6 +36,7 @@ class iSCSI:
                 ofile.write("""
 if [ "${boot_type}" = "iscsi" ]; then
   logp "Setting up iSCSI"
+  modprobe -q sd_mod
   modprobe -q iscsi_tcp
   eval ${boot_args}
 
@@ -42,7 +45,7 @@ if [ "${boot_type}" = "iscsi" ]; then
   echo "InitiatorName=$localiqn" >/etc/iscsi/initiatorname.iscsi
   # Start iscsid with -f which logs to stdout / stderr instead of
   # syslog (which is not available at this time).
-  /sbin/iscsid -d 0 -f >/tmp/iscsid-stdout.log 2>/tmp/iscsid-stderr.log &
+  /bin/iscsid -d 0 -f >/tmp/iscsid-stdout.log 2>/tmp/iscsid-stderr.log &
   echo $! >/etc/iscsi/iscsid.pid
 
   log "Login at all iSCSI ports"
@@ -80,3 +83,23 @@ cp -a /etc/iscsi ${rootmnt}/etc
 logpe
 """)
         return PrepareRootDir()
+
+# ======================================================================
+# === Create hooks
+
+    def mi_Copy(self):
+
+        class Copy:
+            def output(self, c):
+                c.copy("usr/sbin/iscsid", "bin")
+                c.copy("usr/bin/iscsiadm", "bin")
+
+                # The password file is needed.
+                # (If not, the error
+                #   'peeruser_unix: unknown local user with uid 0'
+                # occurs.)
+                f = file(os.path.join(c.tmpdir, "etc/passwd"), "w")
+                f.write("root:x:0:0:root:/root:/bin/bash\n")
+                f.close()
+
+        return Copy()

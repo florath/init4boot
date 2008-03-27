@@ -1,0 +1,106 @@
+Freeing unused kernel memory: 172k freed
+[2008-03-27 21:52:09 UTC] init4boot +++ Phase CommandLineParsing +++
+[2008-03-27 21:52:09 UTC] init4boot Starting up system from initramfs.
+[2008-03-27 21:52:10 UTC] init4boot +++ Phase CommandLineVerbose +++
+[2008-03-27 21:52:10 UTC] init4boot +++ Phase InitialSystemSetup +++
+[2008-03-27 21:52:10 UTC] init4boot +++ Phase CommandLineEvaluation +++
+[2008-03-27 21:52:10 UTC] init4boot Boot variant(s) (manual plus automatic): 'multipath tftp  network'
+[2008-03-27 21:52:10 UTC] init4boot Adding boot variant udev which is needed for multipath
+[2008-03-27 21:52:10 UTC] init4boot Network boot variant is needed for tftp
+[2008-03-27 21:52:10 UTC] init4boot +++ Phase HandleInitialModuleSetup +++
+[2008-03-27 21:52:10 UTC] init4boot + Handling udev
+[2008-03-27 21:52:10 UTC] init4boot +++ Phase SetupLowLevelTransport +++
+[2008-03-27 21:52:10 UTC] init4boot + Handling network
+IP-Config: eth3 hardware address 72:e4:00:00:00:1f mtu 1500 DHCP
+IP-Config: eth3 guessed broadcast address 192.168.228.255
+IP-Config: eth3 guessed nameserver address 192.168.228.26
+IP-Config: eth3 complete (from 192.168.228.26):
+ address: 192.168.228.31   broadcast: 192.168.228.255  netmask: 255.255.255.0   
+ gateway: 0.0.0.0          dns0     : 192.168.228.26   dns1   : 0.0.0.0         
+ rootserver: 192.168.228.26 rootpath: 
+ filename  : 
+[2008-03-27 21:52:26 UTC] init4boot + Setting up tftp
+[2008-03-27 21:52:26 UTC] init4boot Extracting archive
+[2008-03-27 21:52:26 UTC] init4boot +++ Phase SetupHighLevelTransport +++
+[2008-03-27 21:52:26 UTC] init4boot + Setting up iSCSI
+SCSI subsystem initialized
+Loading iSCSI transport class v1.1-646.<5>iscsi: registered transport (tcp)
+[2008-03-27 21:52:26 UTC] init4boot Starting iscsid
+[2008-03-27 21:52:26 UTC] init4boot Login at all iSCSI ports
+[2008-03-27 21:52:26 UTC] init4boot Discovered iSCSI portal at 192.168.228.20 with targets=192.168.228.20:3260,1%iqn.2008-02.de.flonatel:storage.00031
+[2008-03-27 21:52:26 UTC] init4boot Login into port 192.168.228.20:3260,1 at target iqn.2008-02.de.flonatel:storage.00031
+Login session [iface: default, target: iqn.2008-02.de.flonatel:storage.00031, portal: 192.168.228.20,3260]
+scsi0 : iSCSI Initiator over TCP/IP
+  Vendor: IET       Model: VIRTUAL-DISK      Rev: 0   
+  Type:   Direct-Access                      ANSI SCSI revision: 04
+SCSI device sda: 14336000 512-byte hdwr sectors (7340 MB)
+sda: Write Protect is off
+SCSI device sda: drive cache: write through
+SCSI device sda: 14336000 512-byte hdwr sectors (7340 MB)
+sda: Write Protect is off
+SCSI device sda: drive cache: write through
+ sda: sda1
+sd 0:0:0:0: Attached scsi disk sda
+[2008-03-27 21:52:27 UTC] init4boot Discovered iSCSI portal at 192.168.228.21 with targets=192.168.228.21:3260,1%iqn.2008-02.de.flonatel:storage.00031
+[2008-03-27 21:52:27 UTC] init4boot Login into port 192.168.228.21:3260,1 at target iqn.2008-02.de.flonatel:storage.00031
+Login session [iface: default, target: iqn.2008-02.de.flonatel:storage.00031, portal: 192.168.228.21,3260]
+scsi1 : iSCSI Initiator over TCP/IP
+  Vendor: IET       Model: VIRTUAL-DISK      Rev: 0   
+  Type:   Direct-Access                      ANSI SCSI revision: 04
+SCSI device sdb: 14336000 512-byte hdwr sectors (7340 MB)
+sdb: Write Protect is off
+SCSI device sdb: drive cache: write through
+SCSI device sdb: 14336000 512-byte hdwr sectors (7340 MB)
+sdb: Write Protect is off
+SCSI device sdb: drive cache: write through
+ sdb: sdb1
+sd 1:0:0:0: Attached scsi disk sdb
+[2008-03-27 21:52:29 UTC] init4boot + Handling multipath
+device-mapper: ioctl: 4.7.0-ioctl (2006-06-24) initialised: dm-devel@redhat.com
+device-mapper: multipath: version 1.0.4 loaded
+device-mapper: multipath emc: version 0.0.3 loaded
+device-mapper: multipath round-robin: version 1.0.0 loaded
+create: iboot-root (1494554000000000044444545464647303030333100000000)  IET     ,VIRTUAL-DISK  
+[size=6.8G][features=0][hwhandler=0]
+\_ round-robin 0 [prio=1][undef]
+ \_ 0:0:0:0 sda 8:0   [undef][ready] 
+libdevmapper: libdm-common.c(303): Created /dev/mapper/iboot-root
+iboot-root (1494554000000000044444545464647303030333100000000) dm-0 IET     ,VIRTUAL-DISK  
+[size=6.8G][features=1 queue_if_no_path][hwhandler=0]
+\_ round-robin 0 [prio=1][enabled]
+ \_ 0:0:0:0 sda 8:0   [active][ready]
+reload: iboot-root (1494554000000000044444545464647303030333100000000)  IET     ,VIRTUAL-DISK  
+[size=6.8G][features=0][hwhandler=0]
+\_ round-robin 0 [prio=2][undef]
+ \_ 1:0:0:0 sdb 8:16  [undef][ready]
+ \_ 0:0:0:0 sda 8:0   [active][ready]
+iboot-root (1494554000000000044444545464647303030333100000000) dm-0 IET     ,VIRTUAL-DISK  
+[size=6.8G][features=1 queue_if_no_path][hwhandler=0]
+\_ round-robin 0 [prio=2][enabled]
+ \_ 1:0:0:0 sdb 8:16  [active][ready]
+ \_ 0:0:0:0 sda 8:0   [active][ready]
+iboot-root (1494554000000000044444545464647303030333100000000) dm-0 IET     ,VIRTUAL-DISK  
+[size=6.8G][features=1 queue_if_no_path][hwhandler=0]
+\_ round-robin 0 [prio=2][enabled]
+ \_ 1:0:0:0 sdb 8:16  [active][ready]
+ \_ 0:0:0:0 sda 8:0   [active][ready]
+[2008-03-27 21:52:32 UTC] init4boot Accessing all disk once to get the state corrected
+[2008-03-27 21:52:32 UTC] init4boot ... /dev/mapper/iboot-root
+[2008-03-27 21:52:32 UTC] init4boot Waiting for possible multipath switchover to end
+[2008-03-27 21:52:32 UTC] init4boot Creating block devices for partitions
+[2008-03-27 21:52:32 UTC] init4boot ... /dev/mapper/iboot-root
+[2008-03-27 21:52:32 UTC] init4boot +++ Phase SetupDiskDevices +++
+[2008-03-27 21:52:32 UTC] init4boot +++ Phase MountRoot +++
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on dm-1, internal journal
+EXT3-fs: recovery complete.
+EXT3-fs: mounted filesystem with ordered data mode.
+[2008-03-27 21:52:32 UTC] init4boot +++ Phase PrepareRootDir +++
+[2008-03-27 21:52:32 UTC] init4boot + Prepare root dir udev setup
+[2008-03-27 21:52:32 UTC] init4boot + Postmount iSCSI setup
+`/root/etc/iscsi/send_targets/192.168.228.21,3260/iqn.2008-02.de.flonatel:storage.00031,192.168.228.21,3260,1,default' exists
+`/root/etc/iscsi/send_targets/192.168.228.20,3260/iqn.2008-02.de.flonatel:storage.00031,192.168.228.20,3260,1,default' exists
+[2008-03-27 21:52:32 UTC] init4boot +++ Phase CheckForInit +++
+[2008-03-27 21:52:32 UTC] init4boot +++ Phase RunInit +++
+Mount failed for selinuxfs on /selinux:  No such file or directory
+INIT: version 2.86 booting
