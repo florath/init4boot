@@ -1,22 +1,12 @@
 #
 # init4boot tftp plugin
 #
-# (c) 2008 by flonatel
+# (c) 2008 by flonatel (sf@flonatel.org)
 #
 # For licencing details see COPYING
 #
 
 import os
-
-#
-# In some circumstances it makes sense to have much more configuration data
-# available than the 256 (or 4096 in new kernels) characters command line
-# options provide.
-# To get more options into the boot process, a file is retreived via tftp.
-# The file must be a tar file, which is extracted in the root
-# directory.  If exists, the file /tftp.sh is then executed.
-# The hostid command line paramter is used to get the correct file.
-#
 
 class tftp:
 
@@ -56,7 +46,11 @@ fi
                 ofile.write("""
 if check_bv "tftp"; then
    logp "Setting up tftp"
-   atftp --get -r ${clp_hostid}.tar -l /tftp.tar ${clp_tftp}
+   for server in `echo ${clp_tftp} | tr "," " "`; do
+     atftp --get -r ${clp_hostid}.tar -l /tftp.tar ${server}
+     [ $? -eq 0 ] && break
+   done
+       
    if [ -f /tftp.tar ]; then
       log "Extracting archive"
       tar -xf /tftp.tar
