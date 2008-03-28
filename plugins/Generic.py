@@ -1,7 +1,7 @@
 #
 # This is the generic part - also implemented as a plugin
 #
-# (c) 2008 by flonatel
+# (c) 2008 by flonatel (sf@flonatel.org)
 #
 # For licensing details see COPYING
 #

@@ -1,0 +1,10 @@
+2008-03-28  Andreas Florath  <sf@flonatel.org>
+
+	* plugins/tftp.py (tftp.go_SetupLowLevelTransport.
+	SetupLowLevelTransport.cleanup): Changed behaviour from one tftp
+	server only to a comma separated list.
+
+	* ToDo.txt: removed - added the contents to the ooffice.org
+	document in chapter 'Open Points'.
+	
+

@@ -1,9 +1,9 @@
 #
 # init4boot nw_dhcp plugin
 #
-# (c) 2008 by flonatel GmbH & Co. KG
+# (c) 2008 by flonatel (sf@flonatel.org)
 #
-# For licencing details see COPYING
+# For licensing details see COPYING
 #
 
 class nw_dhcp:
@@ -12,8 +12,6 @@ class nw_dhcp:
         self.config = config
 
     def go_SetupLowLevelTransport(self):
-
-        # XXX Add dep to network
 
         class SetupLowLevelTransport:
 

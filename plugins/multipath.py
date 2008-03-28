@@ -1,9 +1,9 @@
 #
 # multipath iSCSI plugin
 #
-# (c) 2008 by flonatel
+# (c) 2008 by flonatel (sf@flonatel.org)
 #
-# For licencing details see COPYING
+# For licensing details see COPYING
 #
 
 import os
