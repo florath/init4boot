@@ -16,7 +16,8 @@ After some time, when everything is taken to the new version, the
 
 Happy booting
 
-Andre
+Andreas Florath
+sf@flonatel.org
 
 
 ===========================================================================
