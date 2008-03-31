@@ -1,0 +1,62 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+#
+# Rules for the init4boot
+#
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+
+#Architecture 
+build: DH_OPTIONS=
+build: build-stamp
+build-stamp: 
+	dh_testdir
+	python setup.py -q build
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	rm -fr build
+	find . -name "*.pyc" | xargs rm -f
+	dh_clean 
+
+install: DH_OPTIONS=
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	python setup.py -q install --no-compile --prefix=debian/init4boot/usr
+
+# Must not depend on anything. This is to be called by
+# binary-arch/binary-indep
+# in another 'make' thread.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_install
+	dh_installchangelogs ChangeLog
+	dh_installdocs
+	dh_installexamples
+	dh_pycentral -i
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress 
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep
+.PHONY: build clean binary-indep binary-arch binary 

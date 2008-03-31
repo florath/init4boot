@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+       "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>i4b - init4boot</title>
+</head>
+<body background="line.png">
+<table border="0">
+<colgroup>
+ <col width="200">
+ <col width="*">
+</colgroup>
+<tr>
+ <td><img src="i4b.png"></td>
+ <td><h1><center><span style="font-family:sans-serif">init4boot - initramfs creation tool</span></center></h1><br>
+</tr>
+<tr>
+ <td valign="top">
+  <span style="font-family:sans-serif">
+  <ul>
+   <li><a href="#overview">Overview</a></li>
+   <li><a href="#project">Project</a></li>
+   <li><a href="#releases">Releases</a></li>
+   <li><a href="#">Download</a></li>
+   <li><a href="#state">State</a></li>
+   <li><a href="#documentation">Documentation</a></li>
+   <li><a href="#license">License</a></li>
+  </ul>
+  </span>
+ </td>
+ <td>
+<span style="font-family:sans-serif">
+ <a name="overview"><h2>Overview</h2></a>
+ <p><em>init4boot</em> is a set of tools for creating an initramfs.
+ The major features are:</p>
+ <ul>
+  <li>Creating of one generic initramfs for mostly all systems</li>
+  <li>Configurable with command line parameters and with an external
+      hosted file from an tftp server</li>
+  <li>Extensible with plugins</li>
+  <li>Support of boot types: iscsi</li>
+  <li>Support of boot varaints: udev, multipath, tftp config,
+      network</li>
+  <li>Supports Guest System booting with Xen</li>
+  </ul>
+ <a name="project"><h2>Project</h2></a>
+ <p>The project is <a href="http://sourceforge.net/projects/init4boot/">hosted
+on sourceforge</a>.  There exists the project infrastructure as svn,
+bug-tracker, news and forums.</p>
+ <a name="releases"><h2>Releases</h2></a>
+ <table border=1>
+ <tr><th>Version</th><th>Date</th><th>Comments</th></tr>
+ <tr><td>0.0.1</td><td>2008-03-31</td><td>Initial release</td></tr>
+ </table>
+ <a name="state"><h2>State</h2></a>
+ <p>The current state of the project is alpha.  Currently it works,
+ but was only tested in a Xen iSCSI environment.</p>
+ <a name="documentation"><h2>Documentation</h2></a>
+ <p>There are two (yet unfinished) documents available:
+ <ul>
+  <li><a href="http://init4boot.svn.sourceforge.net/viewvc/init4boot/trunk/Readme.txt?revision=5&view=markup">Readme.txt</a> from the source</li>
+  <li><a href="i4b-reqdesign.pdf">Requirements and Design</a> as a PDF.
+ </ul>
+ <p>Additional there exists the a <a href="http://init4boot.svn.sourceforge.net/viewvc/init4boot/trunk/doc/boot.log?revision=10&view=markup">log file</a> from a 
+typical boot process from a Xen Guest System with a multipath iSCSI
+root device.</p>
+ <a name="license"><h2>License</h2></a>
+ <p>The source is released under <a href="http://gplv3.fsf.org/">GPLv3</a>.
+</span>
+ </td>
+</tr>
+
+</body>
+</html>
