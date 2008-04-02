@@ -368,25 +368,7 @@ panic "Could not execute run-init."
 
             def __init__(self, opts):
                 self.opts = opts
-
-            # It is not possbile to call the ldd, because the executables
-            # might even not executed on the current system.  So the only
-            # way to do, is to copy all the libs over.
-            def copy_so_libs(self, c):
-                c.cpln("lib.*\.so.*", ["lib", "usr/lib", "lib64", ], "lib")
-
-            # Copy the /lib/ld* things
-            def copy_ldso(self, c):
-                c.cpln("ld.*", ["lib", "lib64"], "lib")
-
-            # Source is in root_dir, dest in tmp dir
-            def copy_exec(self, c, source):
-                dest = "bin"
-                if source[0] == "/":
-                    source = source[1:]
-                shutil.copy2(os.path.join(c.opts.root_dir, source),
-                             os.path.join(c.tmpdir, dest))
-
+                
             def create_sysdirs(self, c):
                 c.log("Creating subdirs")
                 # Note: the lib/modules and lib/firmware is automatically
@@ -421,9 +403,13 @@ panic "Could not execute run-init."
 
             def copy_busybox(self, c):
                 c.log("Copy busybox")
-                self.copy_exec(c, "/bin/busybox")
-                os.symlink("/bin/busybox",
-                           os.path.join(c.tmpdir, "bin/sh"))
+                c.copy_exec("/bin/busybox")
+                dest = os.path.join(c.tmpdir, "bin/sh")
+                destdir = os.path.dirname(dest)
+                if not os.path.exists(destdir):
+                    os.makedirs(destdir)
+                print "DDDDDD %s" % dest
+                os.symlink("/bin/busybox", dest)
         
             def output(self, c):
                 self.create_sysdirs(c)
@@ -440,14 +426,15 @@ panic "Could not execute run-init."
                 ci = mod.InitCreator(None, self.opts)
                 ci.run(os.path.join(c.tmpdir, "init"))
 
-                self.copy_so_libs(c)
-                self.copy_ldso(c)
                 self.copy_busybox(c)
 
                 c.log("Copy modutils")
-                self.copy_exec(c, "/sbin/modprobe")
-                self.copy_exec(c, "/sbin/depmod")
-                self.copy_exec(c, "/sbin/rmmod")
+                c.copy_exec("/sbin/modprobe")
+                c.copy_exec("/sbin/depmod")
+                c.copy_exec("/sbin/rmmod")
+
+                # HACK!
+                os.symlink("/lib", os.path.join(c.tmpdir, "lib64"))
 
                 c.log("Creating cpio archive")
                 os.system("P=$PWD && cd %s &&  find . | " \

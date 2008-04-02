@@ -92,8 +92,11 @@ logpe
 
         class Copy:
             def output(self, c):
-                c.copy("usr/sbin/iscsid", "bin")
-                c.copy("usr/bin/iscsiadm", "bin")
+                c.copy_exec("usr/sbin/iscsid")
+                c.copy_exec("usr/bin/iscsiadm")
+
+                c.copytree(os.path.join(c.opts.root_dir, "lib"),
+                           os.path.join(c.tmpdir, "lib"), "libnss_.*")
 
                 # The password file is needed.
                 # (If not, the error

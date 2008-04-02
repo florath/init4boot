@@ -8,6 +8,9 @@ import os
 import shutil
 import popen2
 import re
+import sys
+
+from init4boot.lib.ldd import ldd
 
 from init4boot.lib.Plugins import Plugins
 from init4boot.lib.MakeInitramfs.MIPhases import MIPhases
@@ -18,6 +21,10 @@ class HandlePlugins:
         self.opts = opts
         # Create the directory where everything goes:
         self.tmpdir = tempfile.mkdtemp(prefix = "make_initramfs-")
+
+        self.root_libs = []
+        self.root_libs.append(os.path.join(self.opts.root_dir, "usr/lib"))
+        self.root_libs.append(os.path.join(self.opts.root_dir, "lib"))
 
     def __del__(self):
         # Removing temporary dir
@@ -40,6 +47,8 @@ class HandlePlugins:
         lre = re.compile(filere)
         for direntry in dirs:
             source_dir = os.path.join(self.opts.root_dir, direntry)
+            if not os.path.isdir(source_dir):
+                continue
             dest_dir = os.path.join(self.tmpdir, direntry)
             # When link -> link
             if os.path.islink(source_dir) and not os.path.exists(dest_dir):
@@ -89,6 +98,34 @@ class HandlePlugins:
             except (IOError, os.error), why:
                 print "Can't copy %s to %s: %s" % \
                       (`srcname`, `dstname`, str(why))    
+
+    # Source is in root_dir, dest in tmp dir
+    def copy_exec(self, source_file):
+        destdir = os.path.join(self.tmpdir, "bin")
+        if not os.path.exists(destdir):
+            os.makedirs(destdir)
+        if source_file[0] == "/":
+            source_file = source_file[1:]
+        source = os.path.join(self.opts.root_dir, source_file)
+        shutil.copy2(source, destdir)
+        # Get the shared libraries for this
+        shared_libs = ldd(source, self.root_libs)
+        print "copy_exec %s (shared libs: %s)" % (source, shared_libs)
+        for lib in shared_libs:
+            if not lib.startswith(self.opts.root_dir):
+                # Oops: got a lib outside the root
+                print "Library '%s' outside the root - Check the links in the root" % lib
+                sys.exit(1)
+            rawdlib = lib[len(self.opts.root_dir):]
+            if rawdlib[0]=="/":
+                rawdlib = rawdlib[1:]
+            destlib = os.path.join(self.tmpdir, rawdlib)
+
+            destdir = os.path.dirname(destlib)
+            if not os.path.exists(destdir):
+                os.makedirs(destdir)
+            shutil.copy2(lib, destlib)
+                    
 
     def create_initramfs(self):
         # Read in all the plugins

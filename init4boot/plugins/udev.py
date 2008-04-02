@@ -91,8 +91,8 @@ fi
                 # XXX Not existsing : c.copy("etc/scsi_id.config", "etc")
                 # WHY: rm -f $DESTDIR/etc/udev/rules.d/*_cd-aliases-generator.rules
                 c.log("Copy used binaries")
-                c.copy("sbin/udevd", "bin")
-                c.copy("sbin/udevtrigger", "bin")
-                c.copy("sbin/udevsettle", "bin")
+                c.copy_exec("sbin/udevd")
+                c.copy_exec("sbin/udevtrigger")
+                c.copy_exec("sbin/udevsettle")
 
         return Copy()

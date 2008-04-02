@@ -74,8 +74,11 @@ fi
         # tar and atftp is needed
         class Copy:
             def output(self, c):
-                c.copy("usr/bin/atftp", "bin")
-                c.copy("bin/tar", "bin")
+                c.copy_exec("usr/bin/atftp")
+                c.copy_exec("bin/tar")
+
+                c.copytree(os.path.join(c.opts.root_dir, "lib"),
+                           c.tmpdir, "libnss_.*")
 
                 f = file(os.path.join(c.tmpdir, "etc/services"), "w")
                 f.write("""

@@ -1,3 +1,37 @@
+2008-04-02  Andreas Florath  <florath@kreon.flonatel.local>
+
+	* init4boot/make_initramfs/HandlePlugins.py
+	(HandlePlugins.copy_exec): Moved copy_exec to HandlePlugins.
+
+	* init4boot/lib/ldd.py: added a machine independant way of 'ldd'
+	function. 
+
+	* init4boot/plugins/multipath.py (multipath.mi_Copy.Copy.output):
+	Using copy_exec instead of simple copy.
+
+	* init4boot/plugins/udev.py (udev.mi_Copy.Copy.output): Using
+	copy_exec instead of simple copy. 
+
+	* init4boot/plugins/tftp.py (tftp.mi_Copy.Copy.output): Using
+	copy_exec instead of simple copy. 
+
+	* init4boot/plugins/Generic.py: Moved copy_exec to HandlePlugins.
+	Removed now unused methods 'copy_so_libs' and 'copy_ldso'.
+
+	* init4boot/plugins/Generic.py (Generic.mi_Copy.Copy.output):
+	Using copy_exec instead of simple copy.
+	
+	* init4boot/plugins/iSCSI.py (iSCSI.mi_Copy.Copy.output): Using
+	new copy_exec instead of simple copy.
+
+	* init4boot/plugins/local.py: added local boot type (not completed
+	yet, load modules is missing)
+
+2008-04-01  Andreas Florath  <andreas@florath.net>
+
+	* init4boot/make_initramfs/HandlePlugins.py (HandlePlugins.cpln): 
+	Checks if the path to copy really exists.
+
 2008-03-28  Andreas Florath  <sf@flonatel.org>
 
 	* plugins/tftp.py (tftp.go_SetupLowLevelTransport.
