@@ -1,4 +1,13 @@
-2008-04-02  Andreas Florath  <florath@kreon.flonatel.local>
+2008-04-03  Andreas Florath  <sf@flonatel.org>
+	
+	* init4boot/plugins/tftp.py (tftp.mi_Copy.Copy.output): Fixed
+	default directory for libnss_ things.
+
+	* init4boot/plugins/Generic.py (Generic.mi_Copy.Copy.output): 
+	Add link from /lib64 to /lib.  Remove module 'nvidiafb' which
+	makes it impossible to load the nvidia module.
+
+2008-04-02  Andreas Florath  <sf@flonatel.org>
 
 	* init4boot/make_initramfs/HandlePlugins.py
 	(HandlePlugins.copy_exec): Moved copy_exec to HandlePlugins.
@@ -27,7 +36,7 @@
 	* init4boot/plugins/local.py: added local boot type (not completed
 	yet, load modules is missing)
 
-2008-04-01  Andreas Florath  <andreas@florath.net>
+2008-04-01  Andreas Florath  <sf@flonatel.org>
 
 	* init4boot/make_initramfs/HandlePlugins.py (HandlePlugins.cpln): 
 	Checks if the path to copy really exists.

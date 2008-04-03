@@ -78,7 +78,7 @@ fi
                 c.copy_exec("bin/tar")
 
                 c.copytree(os.path.join(c.opts.root_dir, "lib"),
-                           c.tmpdir, "libnss_.*")
+                           os.path.join(c.tmpdir, "lib"), "libnss_.*")
 
                 f = file(os.path.join(c.tmpdir, "etc/services"), "w")
                 f.write("""

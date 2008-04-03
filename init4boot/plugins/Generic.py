@@ -240,6 +240,13 @@ log "Boot variant(s) (manual plus automatic): '${clp_bv}'"
     def go_HandleInitialModuleSetup(self):
 
         class HandleInitialModuleSetup:
+
+            def prepare(self, ofile):
+                ofile.write("""
+lognp HandleInitialModuleSetup
+maybe_break HandleInitialModuleSetup
+""")
+
             def pre_output(self, ofile):
                 ofile.write("""
 depmod -a
@@ -386,6 +393,20 @@ panic "Could not execute run-init."
                 shutil.copytree(os.path.join(c.opts.root_dir, "lib/firmware"),
                                 os.path.join(c.tmpdir, "lib/firmware"), True)
 
+            def remove_file(self, name, dir):
+                for file in os.listdir(dir):
+                    fullpath = os.path.join(dir, file)
+                    if name == file and os.path.isfile(fullpath):
+                        print "Deleting file '%s'" % fullpath
+                        os.remove(fullpath)
+                    elif os.path.isdir(fullpath):
+                        self.remove_file(name, fullpath)
+
+            def remove_modules(self, c, bname):
+                c.log("Remove some modules")
+                self.remove_file(bname + ".ko", os.path.join(c.tmpdir,
+                                                             "lib/modules")) 
+
             def copy_klibc(self, c):
                 c.log("Copy klibc binaries")
                 sdir = os.path.join(c.opts.root_dir, "usr/lib/klibc/bin")
@@ -414,6 +435,10 @@ panic "Could not execute run-init."
             def output(self, c):
                 self.create_sysdirs(c)
                 self.copy_modules(c)
+                # These modules must not be loaded at this time
+                # HACK! maybe: move in own plugin and toggle with nonvidia.
+                # maybe: insert during init4boot time to blacklist?
+                self.remove_modules(c, "nvidiafb")
                 # Not sure about the klib things:
                 #  The problem is, that there are some programs that are
                 #  needed (e.g. run-init, fstype, ipconfig) that are
@@ -435,6 +460,8 @@ panic "Could not execute run-init."
 
                 # HACK!
                 os.symlink("/lib", os.path.join(c.tmpdir, "lib64"))
+
+                os.symlink("/bin", os.path.join(c.tmpdir, "sbin"))
 
                 c.log("Creating cpio archive")
                 os.system("P=$PWD && cd %s &&  find . | " \
