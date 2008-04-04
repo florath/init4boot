@@ -1,6 +1,11 @@
 #
 # init4boot tftp plugin
 #
+# Security Waring: All and every data that is transferred unencrypted
+# and all and everybody can get all the data from the tftp server.
+# NEVER EVER use this to transfer configuration files that contain
+# username and / or passwords.
+#
 # (c) 2008 by flonatel (sf@flonatel.org)
 #
 # For licencing details see COPYING

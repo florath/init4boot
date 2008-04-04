@@ -1,0 +1,188 @@
+.\" 
+.\" Man page for i4b-bootparams
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 3 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" (c) 2008 by flonatel (sf@flonatel.org)
+.\"
+.TH i4b-bootparams 5 2008-04-04 "Linux" "Linux booting"
+.SH NAME
+i4b-bootparams \- boot up parameter handling
+.SH DESCRIPTION
+Some special parameters are needed to control the behavoiur when
+booting from a initramfs created by i4b-makeinitramfs.
+.SH OVERVIEW
+When a Linux system is booted, some command line parameters are
+passed to the kernel.  Typically some of them are handled in the
+kernel itself, others are evaluated in the init script of the
+initramfs. 
+.P
+The parameters the kernel handles are descibed in the kernel
+documentation: Documentation/kernel-parameters.txt
+.P
+The paramteres that are evaluated by the init of the initramfs which
+is created by the 
+.B init4boot
+scrips, are explained in this document.
+.P
+The parameters for the kernel and init script are typically passed by
+the boot loader (like grub or lilo), but also it's possible to
+configure them in a Xen configuration file when used to boot up a Xen
+Guest System.
+.SH "BOOT TYPES"
+There are some ways of booting a system, these are called
+.B boot types.
+A boot type is a mandatory parameter and one boot type must be
+specified. Supported boot types are:
+.P
+.B local
+- for local disks. This is mostly true for all (S)ATA, SCSI,
+USB, ... disks connected locally to the computer. 
+.P
+.B iscsi
+- for booting the computer via a network device from a remove iSCSI
+target. 
+.SH "BOOT VARIANTS"
+A
+.B boot variant
+is a minor way of booting.  
+.P 
+Example 1: 
+.B local
+boot type can be handled with or without LVM
+.P
+Example 2:
+.B iscsi
+boot type can be booting with or without multipath (but in any case
+with network enabled)
+.P
+Existing boot variants are:
+.P
+.B multipath
+- When using this boot variant, the tools for handling multipath disk
+access are used to access the root device.  This is typically needed
+in an data center environment with iscsi or fiber channel disks.
+.P
+.B tftp
+- In some cases, the length and possibilities of command line
+parameter handling are not flexible enough.  The tftp boot variant
+supports the configuration of the boot process by a configuration that
+it hosted on a (central) tftp server.  Especially for multipath or
+iscsi booting, mostly the default values do not fit or username(s) and
+password(s) must be adapted.
+.P
+.B network
+- in some cases, there is the need to start up the network during boot
+time.  This can be switched on specifying the network boot variant.
+.P
+.B udev
+- when the boot variant udev is specified, the udev system is started
+up during boot time.
+.SH OVERALL PARAMETERS
+This section descibes the parameters to specify the boot type and the
+boot variant.  Some of these need additional paramters, that are
+described in the apropriate section.
+.SS BOOT TYPE
+There is one paramter, that specifies the boot type:
+.P
+.B rfs=
+.I <boot type>:<additional params>
+.P
+The
+.I <additional params>
+have the form 
+.P
+.B variable=value;[variable=value;]...
+.SS BOOT VARIANT
+The boot variants are specified with the help of a comma separated
+list of boot variants after the paramter
+.B bv=
+.P
+Example: bv=multipath,tftp
+.SS HOSTID
+For different boot variants or types, it is helpfull, to have a unique
+identifier for a special host.  The 
+.B hostid=
+parameter should hold these unique id.  The use of this value is
+described in the boot type of variante where it's used.
+.P
+Example: hostid=iboot
+.SH PARAMETERS FOR 'local'
+The local boot type only handles one additional parameter:
+.P
+.B path
+- The path to the root device.
+.P
+Example:
+rfs=local:path=/dev/hda1
+.SH PARAMETERS FOR 'iscsi'
+The following additional parameters are supported by the iscsi boot
+type:
+.P
+.B localiqn
+- The IQN of the system to start up.
+.P
+.B portals
+- A comma separated list of iSCSI target portals.
+.P
+.B path
+- The path to the root device.
+.P
+Example:
+rfs=iscsi:localiqn=iqn.2008-02.org.flonatel:00031;\\
+.br
+portals=192.168.228.20,192.168.228.21;path=/dev/mapper/iboot-root1
+.SH PARAMETERS FOR 'tftp'
+The tftp boot variant uses tftp to get some more (configuration)
+information during boot.  The parameter 
+.B tftp=
+must contain a comma separated list of IP addresses where to get the
+information from.
+.P
+The list of serves is tried, when the first can serve the file
+<hostid>.tar, this file is taken.
+.P
+The file itself must be a tar file, which is extraced in the initramfs
+root dir.  If after the extraction there is a file name ./tftp.sh this
+file will be sourced by the init script.
+.P
+The typicall use for this is, that configuration files that are needed
+for the boot process (e. g. /etc/multipath.conf) can be placed on a
+dedicated server.  In the ./tftp.sh script, it is possible to set
+environment variables.
+.P
+Example:
+ tftp=192.168.228.24,192.168.228.25
+.SH PARAMETERS FOR 'network'
+Currently only dhcp configuration of network devices is possible.  The
+network devices are specified with 
+.B nw=
+and can be a comma separated list.
+.P
+Example:
+ nw=eth3:dhcp,eth5:dhcp
+.SH "SEE ALSO"
+.B i4b-makeinitramfs(1)
+- tool for creating an initramfs
+.P
+.B i4b-bootparams(5)
+- paramters to configure the boot process
+.SH AUTHOR
+Written by Andreas Florath (sf@flonatel.org)
+.SH COPYRIGHT
+Copyright \(co 2008 by flonatel (sf@flonatel.org).
+License GPLv3+: GNU GPL version 3 or later
+

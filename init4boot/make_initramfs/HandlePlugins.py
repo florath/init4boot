@@ -28,8 +28,8 @@ class HandlePlugins:
 
     def __del__(self):
         # Removing temporary dir
-#        self.remove_tmp_dir()
-        print "rm -fr %s" % self.tmpdir
+        self.remove_tmp_dir()
+#        print "rm -fr %s" % self.tmpdir
 
     def log(self, m):
         print "*** " + m
@@ -40,7 +40,11 @@ class HandlePlugins:
             for name in files:
                 os.remove(os.path.join(root, name))
             for name in dirs:
-                os.rmdir(os.path.join(root, name))
+                fn = os.path.join(root, name)
+                if os.path.islink(fn):
+                    os.remove(fn)
+                else:
+                    os.rmdir(fn)
         os.rmdir(self.tmpdir)
 
     def cpln(self, filere, dirs, destdir):

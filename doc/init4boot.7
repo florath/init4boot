@@ -1,0 +1,48 @@
+.\" 
+.\" Man page for whole package init4boot
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 3 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" (c) 2008 by flonatel (sf@flonatel.org)
+.\"
+.TH init4boot 7 2008-04-04 "Linux" "Linux booting"
+.SH NAME
+init4boot \- create initramfs for boot - overview -
+.SH DESCRIPTION
+The
+.B init4boot 
+package is used to create an initramfs for booting a
+Linux system.  
+.SH OVERVIEW
+Some steps are needed to get it up and running.
+.P 
+First the initramfs must be created, then
+.P 
+the initramfs must be installed, and
+.P 
+special parameters must be used to configure the boot process. 
+.SH "SEE ALSO"
+.B i4b-makeinitramfs(1)
+- tool for creating an initramfs
+.P
+.B i4b-bootparams(5)
+- paramters to configure the boot process
+.SH AUTHOR
+Written by Andreas Florath (sf@flonatel.org)
+.SH COPYRIGHT
+Copyright \(co 2008 by flonatel (sf@flonatel.org).
+License GPLv3+: GNU GPL version 3 or later
+

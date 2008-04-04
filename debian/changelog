@@ -1,3 +1,9 @@
+init4boot (0.0.2) unstable; urgency=low
+
+  * Added support for bare metal booting.
+
+ -- Andreas Florath <sf@flonatel.org>  Fri, 04 Apr 2008 19:39:12 +0200
+
 init4boot (0.0.1) unstable; urgency=low
 
   * Initial Release.

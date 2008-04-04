@@ -20,7 +20,7 @@ class Options:
         parser.add_option("-p", "--plugins", dest="plugins_dir",
                           action="store", type="string",
                           help="The name of the plugin dir. " +
-                          "Default: /usr/share/pycentral/init4boot/site-packages/init4boot/plugins")
+                          "Default: /usr/share/pyshared")
 
         (self.options, args) = parser.parse_args()
 
@@ -33,5 +33,5 @@ class Options:
             self.options.root_dir = ""
             
         if self.options.plugins_dir == None:
-            self.options.plugins_dir = "/usr/share/pycentral/init4boot/site-packages"
+            self.options.plugins_dir = "/usr/share/pyshared"
             

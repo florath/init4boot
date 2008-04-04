@@ -1,3 +1,20 @@
+2008-04-04  Andreas Florath  <sf@flonatel.org>
+
+	* doc/i4b-bootparams.5: Added man page.
+
+	* doc/init4boot.7: Added common man page.
+
+	* init4boot/plugins/tftp.py: Added security comment.
+
+	* init4boot/make_initramfs/HandlePlugins.py 
+	(HandlePlugins.remove_tmp_dir): Fixed problem with links to dirs.
+
+	* init4boot/make_initramfs/HandlePlugins.py (HandlePlugins.__del__): 
+	The tmp directory is now removed after creating the initramfs.
+	
+	* init4boot/make_initramfs/Options.py (Options.__init__): 
+	New python shared default destination.
+
 2008-04-03  Andreas Florath  <sf@flonatel.org>
 	
 	* init4boot/plugins/tftp.py (tftp.mi_Copy.Copy.output): Fixed
