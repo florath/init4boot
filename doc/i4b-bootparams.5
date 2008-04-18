@@ -23,7 +23,8 @@
 i4b-bootparams \- boot up parameter handling
 .SH DESCRIPTION
 Some special parameters are needed to control the behavoiur when
-booting from a initramfs created by i4b-makeinitramfs.
+booting from a initramfs created by 
+.B i4b-makeinitramfs.
 .SH OVERVIEW
 When a Linux system is booted, some command line parameters are
 passed to the kernel.  Typically some of them are handled in the
@@ -31,7 +32,8 @@ kernel itself, others are evaluated in the init script of the
 initramfs. 
 .P
 The parameters the kernel handles are descibed in the kernel
-documentation: Documentation/kernel-parameters.txt
+documentation: Documentation/kernel-parameters.txt in the Linux source
+tree. 
 .P
 The paramteres that are evaluated by the init of the initramfs which
 is created by the 
@@ -53,7 +55,7 @@ specified. Supported boot types are:
 USB, ... disks connected locally to the computer. 
 .P
 .B iscsi
-- for booting the computer via a network device from a remove iSCSI
+- for booting the computer via a network device from a remote iSCSI
 target. 
 .SH "BOOT VARIANTS"
 A
@@ -74,19 +76,19 @@ Existing boot variants are:
 .B multipath
 - When using this boot variant, the tools for handling multipath disk
 access are used to access the root device.  This is typically needed
-in an data center environment with iscsi or fiber channel disks.
-.P
-.B tftp
-- In some cases, the length and possibilities of command line
-parameter handling are not flexible enough.  The tftp boot variant
-supports the configuration of the boot process by a configuration that
-it hosted on a (central) tftp server.  Especially for multipath or
-iscsi booting, mostly the default values do not fit or username(s) and
-password(s) must be adapted.
+in a data center environment with iscsi or fiber channel disks.
 .P
 .B network
 - in some cases, there is the need to start up the network during boot
 time.  This can be switched on specifying the network boot variant.
+.P
+.B tftp
+- In some cases, the length and possibilities of command line
+parameter handling are not sufficient and flexible enough.  The tftp
+boot variant supports the configuration of the boot process by a
+configuration that is hosted on a (central) tftp server.  Especially
+for multipath or iscsi booting, in most cases the default values do
+not fit or username(s) and password(s) must be adapted.
 .P
 .B udev
 - when the boot variant udev is specified, the udev system is started
@@ -120,7 +122,7 @@ parameter should hold these unique id.  The use of this value is
 described in the boot type of variante where it's used.
 .P
 Example: hostid=iboot
-.SH PARAMETERS FOR 'local'
+.SH BOOT TYPE 'local'
 The local boot type only handles one additional parameter:
 .P
 .B path
@@ -128,7 +130,7 @@ The local boot type only handles one additional parameter:
 .P
 Example:
 rfs=local:path=/dev/hda1
-.SH PARAMETERS FOR 'iscsi'
+.SH BOOT TYPE 'iscsi'
 The following additional parameters are supported by the iscsi boot
 type:
 .P
@@ -145,7 +147,15 @@ Example:
 rfs=iscsi:localiqn=iqn.2008-02.org.flonatel:00031;\\
 .br
 portals=192.168.228.20,192.168.228.21;path=/dev/mapper/iboot-root1
-.SH PARAMETERS FOR 'tftp'
+.SH BOOT VARIANT 'network'
+Currently only dhcp configuration of network devices is possible.  The
+network devices are specified with 
+.B nw=
+and can be a comma separated list.
+.P
+Example:
+ nw=eth3:dhcp,eth5:dhcp
+.SH BOOT VARIANT 'tftp'
 The tftp boot variant uses tftp to get some more (configuration)
 information during boot.  The parameter 
 .B tftp=
@@ -166,20 +176,22 @@ environment variables.
 .P
 Example:
  tftp=192.168.228.24,192.168.228.25
-.SH PARAMETERS FOR 'network'
-Currently only dhcp configuration of network devices is possible.  The
-network devices are specified with 
-.B nw=
-and can be a comma separated list.
 .P
-Example:
- nw=eth3:dhcp,eth5:dhcp
+.B Note:
+The current realization has a major security issue: there is no access
+control with tftp and the file is stored and transferred unencrypted.
+Be sure not to store usernames or passwords in the file transferred -
+until you are realy sure what you are doing.
+.SH BOOT VARIANT 'udev'
+Nowadays there seems no reason why 'udev' should not be used, and for
+the multipath boot variant, udev is mandatory.  You should think twice
+before not using this.
 .SH "SEE ALSO"
+.B init4boot(7)
+- Overview over the different aspects of the init4boot package.
+.P
 .B i4b-makeinitramfs(1)
 - tool for creating an initramfs
-.P
-.B i4b-bootparams(5)
-- paramters to configure the boot process
 .SH AUTHOR
 Written by Andreas Florath (sf@flonatel.org)
 .SH COPYRIGHT

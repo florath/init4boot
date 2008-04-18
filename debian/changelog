@@ -1,3 +1,9 @@
+init4boot (0.1) unstable; urgency=low
+
+  * Added man pages and documentation
+
+ -- Andreas Florath <sf@flonatel.org>  Fri, 18 Apr 2008 21:22:12 +0200
+
 init4boot (0.0.2) unstable; urgency=low
 
   * Added support for bare metal booting.

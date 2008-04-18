@@ -1,0 +1,68 @@
+.\" 
+.\" Man page for makeinitramfs
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 3 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" (c) 2008 by flonatel (sf@flonatel.org)
+.\"
+.TH init4boot 7 2008-04-15 "Linux" "Linux booting"
+.SH NAME
+i4b-makeinitramfs \- create an initramfs for boot
+.SH SYNOPSIS
+.B i4b-makeinitramfs
+.B \-o 
+.I out-initramfs
+.B \-r
+.I root-directory
+.SH DESCRIPTION
+The
+.B i4b-makeinitramfs
+utility creates the initramfs for the system specified by the 
+.B -r
+switch.  With the help
+of this initramfs it is possible to boot.
+.P
+Compated to other tools, the resulting initramfs is universal usable -
+there are no configuration parameters and / or files included.  Every
+aspect of the boot process can be controlled by the boot command line
+parmaters. ( see 
+.B i4b-bootparams(5)
+)
+.SH OPTIONS
+.TP
+\fB\-o\fR
+.I out-initramfs
+.P
+The name of the initramfs that will be written.
+.TP
+\fB\-r\fR
+.I root-dir
+.P
+The path to the root dir to use for building the initramfs.  This can
+be the root directory of the current running system (/) but also a
+path to an installation done with debootstrap.
+.SH "SEE ALSO"
+.B init4boot(7)
+- Overview over the different aspects of the init4boot package.
+.P
+.B i4b-bootparams(5)
+- paramters to configure the boot process
+.SH AUTHOR
+Written by Andreas Florath (sf@flonatel.org)
+.SH COPYRIGHT
+Copyright \(co 2008 by flonatel (sf@flonatel.org).
+License GPLv3+: GNU GPL version 3 or later
+
