@@ -18,6 +18,10 @@ tarball:
 	cp -a ChangeLog COPYING debian doc i4b-mkinitramfs init4boot \
 	    Makefile Readme.txt setup.py Tested.txt ${I}
 	find ${I} -name ".svn" | xargs rm -fr
+	find ${I} -name "*~" | xargs rm -fr
+	rm -fr ${I}/doc/screenshots
+	rm -fr ${I}/doc/*.pdf
+	rm -fr ${I}/debian/init4boot
 	tar -cvf ${I}.tar ${I}
 	bzip2 -9 ${I}.tar
 	rm -fr ${I}
