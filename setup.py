@@ -5,7 +5,7 @@ import os, sys
 from distutils.core import setup
 
 package = 'init4boot'
-version = '0.1'
+version = '0.2'
 
 def adjust(input, output):
     if os.path.exists(output):
