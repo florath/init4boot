@@ -35,6 +35,16 @@ install: build
 	dh_installdirs
 	python setup.py -q install --no-compile --prefix=debian/init4boot/usr
 
+	mkdir -p debian/init4boot-client/etc/init.d
+	install init.d/init4boot-client debian/init4boot-client/etc/init.d
+
+	mkdir -p debian/init4boot-doc/usr/share/doc/init4boot-doc
+	install doc/RequirementsDesign.odt debian/init4boot-doc/usr/share/doc/init4boot-doc
+	install doc/screenshots/i4bscreenshot1.png debian/init4boot-doc/usr/share/doc/init4boot-doc
+	install doc/screenshots/i4bscreenshot2.png debian/init4boot-doc/usr/share/doc/init4boot-doc
+	install doc/boot.log debian/init4boot-doc/usr/share/doc/init4boot-doc
+
+
 # Must not depend on anything. This is to be called by
 # binary-arch/binary-indep
 # in another 'make' thread.

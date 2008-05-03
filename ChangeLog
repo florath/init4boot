@@ -1,5 +1,9 @@
 2008-05-03  Andreas Florath  <sf@flonatel.org>
 
+	* debian/control, debian/rules: Added doc and client package.
+
+	* debian/init4boot-client.postinst: added.
+
 	* doc/i4b-makeinitramfs.1: Added permissions section.
 
 	* doc/RequirementsDesign.odt: Added requirement, that the package

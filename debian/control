@@ -26,3 +26,12 @@ Description: Documentation for init4boot
  It's extensible, supports iSCSI boot and can be used in a 
  Xen environment.
  
+Package: init4boot-client
+Architecture: all
+Depends: ${python:Depends}
+XB-Python-Version: ${python:Versions}
+Description: Creates init script and initramfs: client boot part
+ init4boot is a set of utilities to create an initramfs and 
+ corresponding init scripts that are used during boot. 
+ It's extensible, supports iSCSI boot and can be used in a 
+ Xen environment.

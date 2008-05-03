@@ -1,0 +1,53 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          init4boot-client
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Set up for iSCSI root device
+# Description        Does setups and cleanups for the iSCSI root device
+### END INIT INFO
+# Author: Andreas Florath <sf@flonatel.org>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="iSCSI for root device"
+NAME="iscsi4boot-client"
+SCRIPTNAME=/etc/init.d/$NAME
+
+. /lib/lsb/init-functions
+
+do_start()
+{
+    if [ -f /etc/iscsi/iscsid.pid ] ; then
+	kill `cat /etc/iscsi/iscsid.pid`
+	sleep 3
+	kill -9 `cat /etc/iscsi/iscsid.pid`
+	rm /etc/iscsi/iscsid.pid
+	return 0
+    fi
+    return 1
+}
+
+case "$1" in
+  start)
+        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+        do_start
+        case "$?" in
+                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
+  stop)
+	# Nothing to do.
+        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	log_end_msg 0 
+        ;;
+
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop}" >&2
+        exit 3
+        ;;
+esac
+
+
