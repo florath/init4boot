@@ -7,7 +7,8 @@
 
 	* doc/init4boot.7: Added i4b-syssetup.5 reference.
 
-	* doc/i4b-syssetup.5: Added man page for system setup.
+	* doc/i4b-syssetup.5: Added man page for system setup. Added list
+	of dependend packages.
 
 2008-04-04  Andreas Florath  <sf@flonatel.org>
 
