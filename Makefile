@@ -22,6 +22,8 @@ tarball:
 	rm -fr ${I}/doc/screenshots
 	rm -fr ${I}/doc/*.pdf
 	rm -fr ${I}/debian/init4boot
+	rm -fr ${I}/debian/init4boot-doc
+	rm -fr ${I}/debian/init4boot-client
 	tar -cvf ${I}.tar ${I}
 	bzip2 -9 ${I}.tar
 	rm -fr ${I}
