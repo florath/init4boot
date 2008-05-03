@@ -1,0 +1,76 @@
+.\" 
+.\" Man page for i4b-syssetup
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 3 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" (c) 2008 by flonatel (sf@flonatel.org)
+.\"
+.TH i4b-syssetup 5 2008-05-03 "Linux" "Linux booting"
+.SH NAME
+i4b-syssetup \- set up system to create initramfs
+.SH DESCRIPTION
+There is the need for some special preparations to run the 
+.B i4b-makeinitramfs
+command.  
+.SH OVERVIEW
+There are three possibilities to set up a system for initramfs creation:
+use the current system, copy over the files from a foreign system or
+install a new system in a directory.
+.SH "DEPENDENCIES"
+.P
+In all of the three solutions, there must be a number of packges
+installed / to be installed, to get everything working.
+.P
+It is not possible to have the automatic dependencies to these
+packages, because the build system might be different from the target
+system.
+.P
+The following packages (as of Debian 4r3 stable) must be installed:
+.TP
+python
+.TP
+multipath-tools
+.TP
+open-iscsi
+.SH "CURRENT SYSTEM"
+This is the easiest way to use.  Just use the data from the current
+system and create a initramfs from this.
+To use this, use '-r /' as parameter to the
+.B i4b-makeinitramfs
+program.
+.SH "COPY OVER"
+Install some system, and copy over the directories
+.B /sbin /bin /etc
+to a directory on the build system.  Then specify this directory with
+the -r parameter to 
+.B i4b-makeinitramfs
+.SH "DEBOOTSTRAP"
+Use debootstrap (or a similar thing for your distribution) to install
+a new system in a directory.  Also install the packages (typically
+with fakeroot) described in section 
+.B DEPENDENCIES.
+.SH "SEE ALSO"
+.B init4boot(7)
+- Overview over the different aspects of the init4boot package.
+.P
+.B i4b-makeinitramfs(1)
+- tool for creating an initramfs
+.SH AUTHOR
+Written by Andreas Florath (sf@flonatel.org)
+.SH COPYRIGHT
+Copyright \(co 2008 by flonatel (sf@flonatel.org).
+License GPLv3+: GNU GPL version 3 or later
+

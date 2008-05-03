@@ -1,3 +1,12 @@
+2008-05-03  Andreas Florath  <sf@flonatel.org>
+
+	* doc/RequirementsDesign.odt: Added requirement, that the package
+	should be build on a stable system.
+
+	* doc/init4boot.7: Added i4b-syssetup.5 reference.
+
+	* doc/i4b-syssetup.5: Added man page for system setup.
+
 2008-04-04  Andreas Florath  <sf@flonatel.org>
 
 	* doc/i4b-bootparams.5: Added man page.
