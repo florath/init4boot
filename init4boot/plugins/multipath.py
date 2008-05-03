@@ -94,11 +94,14 @@ fi
                 c.copy_exec("sbin/kpartx")
                 c.copy_exec("sbin/devmap_name")
                 c.copy_exec("sbin/dmsetup")
-                c.copy("lib/udev/dmsetup_env", "lib/udev")
+                # Not available in Debian stable
+                # (Part of kpartx package which is only available in unstable)
+                #                c.copy("lib/udev/dmsetup_env", "lib/udev")
                 c.copy_exec("sbin/mpath_prio_alua")
                 c.copy_exec("sbin/mpath_prio_emc")
-                c.copy_exec("sbin/mpath_prio_hp_sw")
-                c.copy_exec("sbin/mpath_prio_rdac")
+                # Not in multipath stable
+                # c.copy_exec("sbin/mpath_prio_hp_sw")
+                # c.copy_exec("sbin/mpath_prio_rdac")
                 c.copy_exec("sbin/mpath_prio_netapp")
                 c.copy_exec("sbin/mpath_prio_random")
                 c.copy_exec("sbin/mpath_prio_hds_modular")

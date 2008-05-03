@@ -33,5 +33,5 @@ class Options:
             self.options.root_dir = ""
             
         if self.options.plugins_dir == None:
-            self.options.plugins_dir = "/usr/share/pyshared"
+            self.options.plugins_dir = "/usr/share/pycentral/init4boot/site-packages"
             
