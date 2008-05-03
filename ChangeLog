@@ -1,5 +1,7 @@
 2008-05-03  Andreas Florath  <sf@flonatel.org>
 
+	* doc/i4b-makeinitramfs.1: Added permissions section.
+
 	* doc/RequirementsDesign.odt: Added requirement, that the package
 	should be build on a stable system.
 
