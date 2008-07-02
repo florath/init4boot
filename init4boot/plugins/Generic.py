@@ -84,12 +84,7 @@ get_fstype ()
 {
   local fs fstype fssize ret
   fs="${1}"
-  # vol_id has a more complete list of file systems,
-  # but fstype is more robust
-  eval $(fstype "${fs}" 2> /dev/null)
-  if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
-    FSTYPE=$(/lib/udev/vol_id -t "${fs}" 2> /dev/null)
-  fi
+  FSTYPE=$(/lib/udev/vol_id -t "${fs}" 2> /dev/null)
   ret=$?
 
   if [ -z "${FSTYPE}" ]; then
@@ -110,6 +105,12 @@ check_bv()
 	[ "${m}" = "${1}" ] && return 0
     done
     return 1
+}
+nuke()
+{
+    d=$1
+    find $d ! -type d 2>/dev/null | xargs rm -fr -- 
+    find $d 2>/dev/null | xargs rm -fr -- 
 }
 
 # Global variables
@@ -407,30 +408,40 @@ panic "Could not execute run-init."
                 self.remove_file(bname + ".ko", os.path.join(c.tmpdir,
                                                              "lib/modules")) 
 
-            def copy_klibc(self, c):
-                c.log("Copy klibc binaries")
-                sdir = os.path.join(c.opts.root_dir, "usr/lib/klibc/bin")
-                for d in os.listdir(sdir):
-                    shutil.copy2(os.path.join(sdir, d),
-                                 os.path.join(c.tmpdir, "bin"))
-
-                c.log("Copy klibc libs")
-                sdir = os.path.join(c.opts.root_dir, "lib")
-                lre = re.compile("klibc-.*\.so")
-                for d in os.listdir(sdir):
-                    if lre.match(d):
-                        shutil.copy2(os.path.join(sdir, d),
-                                     os.path.join(c.tmpdir, "lib"))
+            # This is only needed for the Fedora way of busybox
+            # (and it does no harm under Debian)
+            def make_busybox_links(self, c):
+                for p in [
+                    "cat", 
+                    "cp",
+                    "date",
+                    "find", 
+                    "ifconfig", 
+                    "ln", 
+                    "mkdir", 
+                    "mknod", 
+                    "mount", 
+                    "readlink",
+                    "rm",
+                    "route", 
+                    "tftp", 
+                    "tr", 
+                    "udhcpc", 
+                    "xargs"
+                    ]:
+                    dest = os.path.join(c.tmpdir, "bin", p)
+                    os.symlink("/bin/busybox", dest)
 
             def copy_busybox(self, c):
                 c.log("Copy busybox")
-                c.copy_exec("/bin/busybox")
+                c.copy_exec_w_path("busybox", ["bin", "sbin"])
                 dest = os.path.join(c.tmpdir, "bin/sh")
                 destdir = os.path.dirname(dest)
                 if not os.path.exists(destdir):
                     os.makedirs(destdir)
                 print "DDDDDD %s" % dest
                 os.symlink("/bin/busybox", dest)
+                self.make_busybox_links(c)
         
             def output(self, c):
                 self.create_sysdirs(c)
@@ -439,11 +450,6 @@ panic "Could not execute run-init."
                 # HACK! maybe: move in own plugin and toggle with nonvidia.
                 # maybe: insert during init4boot time to blacklist?
                 self.remove_modules(c, "nvidiafb")
-                # Not sure about the klib things:
-                #  The problem is, that there are some programs that are
-                #  needed (e.g. run-init, fstype, ipconfig) that are
-                #  needed and not available with the some libc.
-                self.copy_klibc(c)
 
                 mod = __import__("init4boot.lib.CreateInit.InitCreator",
                                  globals(), locals(), "InitCreator")
@@ -452,11 +458,20 @@ panic "Could not execute run-init."
                 ci.run(os.path.join(c.tmpdir, "init"))
 
                 self.copy_busybox(c)
+                c.copy_exec("/bin/sleep")
 
                 c.log("Copy modutils")
                 c.copy_exec("/sbin/modprobe")
                 c.copy_exec("/sbin/depmod")
                 c.copy_exec("/sbin/rmmod")
+
+                # Only for debugging
+                c.copy_exec("/usr/bin/strace")
+                c.copy_exec("/usr/bin/nc")
+
+                # HACK!
+                if os.path.exists("/tmp/run-init"):
+                    c.copy_exec("/tmp/run-init")
 
                 # HACK!
                 os.symlink("/lib", os.path.join(c.tmpdir, "lib64"))

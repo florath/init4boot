@@ -52,8 +52,10 @@ fi
                 ofile.write("""
 if check_bv "tftp"; then
    logp "Setting up tftp"
+   maybe_break tftp
+
    for server in `echo ${clp_tftp} | tr "," " "`; do
-     atftp --get -r ${clp_hostid}.tar -l /tftp.tar ${server}
+     tftp -g -r ${clp_hostid}.tar -l /tftp.tar ${server}
      [ $? -eq 0 ] && break
    done
        
@@ -79,12 +81,16 @@ fi
         # tar and atftp is needed
         class Copy:
             def output(self, c):
-                c.copy_exec("usr/bin/atftp")
+# Use busybox instead
+#                c.copy_exec("usr/bin/atftp")
                 c.copy_exec("bin/tar")
 
                 c.copytree(os.path.join(c.opts.root_dir, "lib"),
                            os.path.join(c.tmpdir, "lib"), "libnss_.*")
 
+                etcdir = os.path.join(c.tmpdir, "etc")
+                if not os.path.exists(etcdir):
+                    os.makedirs(etcdir)
                 f = file(os.path.join(c.tmpdir, "etc/services"), "w")
                 f.write("""
 tftp            69/udp

@@ -20,6 +20,7 @@ class network:
                 ofile.write("""
 if check_bv "network"; then
   logp "Handling network"
+  maybe_break network
 
   for nwdev in `echo ${clp_nw} | tr "," " "`; do
     device=${nwdev%:*}

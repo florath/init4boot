@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+       "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta name="description" content="init4boot - create an advanced initramfs">
+<meta name="author" content="flonatel GmbH & Co. KG">
+<meta name="keywords" content="iscsi, boot, debian, fedora, xen, initramfs, init">
+<meta name="date" content="2001-12-15T08:49:37+02:00">
+<title>i4b - init4boot</title>
+</head>
+<body background="line.png">
+<table border="0">
+<colgroup>
+ <col width="200">
+ <col width="*">
+</colgroup>
+<tr>
+ <td><img src="i4b.png"></td>
+ <td><h1><center><span style="font-family:sans-serif">Howto setup init4boot with Fedora Core 9</span></center></h1><br>
+</tr>
+<tr>
+ <td valign="top">
+  <span style="font-family:sans-serif">
+  <ul>
+   <li><a href="index.html">Home</a></li>
+   <li><a href="#overview">Overview</a></li>
+   <li><a href="#preparation">Preparation</a></li>
+   <li><a href="#basicinstallation">Basic Installation</a></li>
+   <li><a href="#iscsisetup">iSCSI Setup</a></li>
+   <li><a href="#finishinstallation">Finish Installation</a></li>
+   <li><a href="#boot">Boot into New System</a></li>
+  </ul>
+  </span>
+ </td>
+ <td>
+<span style="font-family:sans-serif">
+ <a name="overview"><h2>Overview</h2></a>
+ <p>This howto describes how to setup a Fedora Core 9 using <em>init4boot</em> initramfs.</p>
+ <p>The aim is, to get a ready to use Fedora Core 9 system that boots from iSCSI.
+ This setup assumes, that the new system will run as a guest system
+ under Xen.</p>
+
+ <a name="preparation"><h2>Preparation</h2></a>
+ <p>Before starting, the following things must be available:
+   <ul>
+     <li>Fedora Core 9 DVD as image file.</li>
+     <li>An additional guest system or another (bare metal) system
+     running a NFS server.</li>
+     <li>Some disk storage on an iSCSI storage system.  This might be
+     some special hardware device or a Linux box running an iSCSI
+     target.  It is out of scope how to create such a disk - please
+     consult the manual pages comming with your system.</li>
+   </ul></p>
+
+ <p>Put the DVD image to the additional computer where an NFS server
+ is running.  Loop-mount it and export it via NFS.  Note: pick a short
+ name for the path - you'll have to type this some times...</p>
+
+ <p>Create a directory on the Xen box (inside the dom0), and put the
+ following files into this directory:
+   <ul>
+     <li><a href="fedora_guest_setup/fc9-install.sxp">fc9-install.sxp</a>:
+     Xen configuration file - this must be adapted to your needs.</li>
+     <li>vmlinuz: grab this from the Fedora image from
+     [mountpoint]/images/xen/vmlinuz</li>
+     <li>initrd.img: grab this from the Fedora image from
+     [mountpoint]/images/xen/initrd.img</li>
+   </ul></p>
+ <p>Startup the guest system:</p><p><tt>xm create -c
+ fc9-install.sxp</tt></p>
+
+ <p>Start up a vnc viewer and connect to the freshly generated guest
+ system: the IP address is the one from the host system, the port is
+ somewhat random starting at 5900.  (So if port 5900 is used by
+ another server, increase the port number by 1 and try again, and
+ again...)</p>
+
+ <a name="basicinstallation"><h2>Basic Installation</h2></a>
+ <p>The installation is mostly the same as any other Fedora
+ installation - just follow the instructions - and stop at the right
+ point:</p> 
+
+ <img src="fedora_guest_setup/01.png">
+
+ <img src="fedora_guest_setup/02.png">
+
+ <img src="fedora_guest_setup/03.png">
+
+ <img src="fedora_guest_setup/04.png">
+
+ <img src="fedora_guest_setup/05.png">
+
+ <img src="fedora_guest_setup/06.png">
+
+ <img src="fedora_guest_setup/07.png">
+
+ <img src="fedora_guest_setup/08.png">
+
+ <img src="fedora_guest_setup/09.png">
+
+ <img src="fedora_guest_setup/10.png">
+
+ <img src="fedora_guest_setup/11.png">
+
+ <img src="fedora_guest_setup/12.png">
+
+ <p>Press <tt>OK</tt> here and proceed to the next page, where you
+ have to enter the root password.  Enter the root password, <b>but do
+ not press OK</b>.</p>
+
+ <img src="fedora_guest_setup/13.png">
+
+ <a name="iscsisetup"><h2>iSCSI Setup</h2></a>
+ <p>Instead of pressing OK, press ALT-Crsr-Rigth to switch to another
+ terminal - which gives you the shell and the control.</p>
+ <p>(The standard Fedora iSCSI setup seems broken - and is not very
+ flexible.  It is, e.g. not possible to use username / password for
+ authentication or discovery.)</p>
+ 
+ <img src="fedora_guest_setup/14.png">
+
+ <h3>Setup of initiatorname</h3>
+ <p>To set the initiatorname, create the corresponding directory and
+ edit the initiatorname.iscsi file:</p>
+
+ <img src="fedora_guest_setup/15.png">
+
+ <h3>iscsid Configuration and Startup</h3>
+ <p>If you want, you can now setup the configuration for iscsid.  This
+ is needed, if some non standard configuration must be used,
+ e.g. usernames and passwords.  Please have a look at the iscsid
+ documentation how to specify the parameters.</p>
+
+ <img src="fedora_guest_setup/16.png">
+
+ <h3>iSCSI target discovery</h3>
+ <p>To discover the iSCSI disk(s), use the following command:</p>
+ <p><tt>iscsiadm -m discovery -t sendtargets -p
+ [iSCSI-Filer-IP]:[iSCSIFiler-Port]</tt></p>
+ <p>Typically the iSCSIFiler-Port is the standard iSCSI Port:
+ 3260.</p>
+ <p>The command returns the port (up to the first space; Note: the
+ ',1' (or ',N') is part of the port) and the target (rest of the
+ line).</p>
+
+ <img src="fedora_guest_setup/17.png">
+
+ <h3>iSCSI target login</h3>
+ <p>To login into the detected targets, use the following command:</p>
+ <p><tt>iscsiadm -m node -T [target] -p [port] -l</tt></p>
+ <p>where target and port are the values from the discovery command.</p>
+
+ <img src="fedora_guest_setup/18.png">
+
+ <p>To check the success (or failure), you can switch with
+ ALT-Crsr-Right to some log console:</p>
+
+ <img src="fedora_guest_setup/19.png">
+
+ <p>Now switch back to the first console (with Alt-Crsr-Left) where
+ you entered the root password.</p>
+
+ <img src="fedora_guest_setup/20.png">
+
+ <a name="finishinstallation"><h2>Finish Installation</h2></a>
+ 
+ <p>Continue the installation.  The iSCSI disk will be used now as if
+ this were a normal local disk.</p>
+
+ <img src="fedora_guest_setup/21.png">
+
+ <p>In this example, a custom disk layout way chosen - only one
+ partition without any swap.</p>
+
+ <img src="fedora_guest_setup/22.png">
+
+ <img src="fedora_guest_setup/23.png">
+
+ <img src="fedora_guest_setup/24.png">
+
+ <img src="fedora_guest_setup/25.png">
+
+ <img src="fedora_guest_setup/26.png">
+
+ <img src="fedora_guest_setup/27.png">
+
+ <img src="fedora_guest_setup/28.png">
+
+ <p>No boot loader is needed for this setup - initramfs and kernel are
+ stored on the dom0.</p>
+
+ <img src="fedora_guest_setup/29.png">
+
+ <img src="fedora_guest_setup/30.png">
+
+ <p>Chose the packages you want to install. (Note that iscsi
+ initiator must be installed.  This can be done now (easy way) or later.</p>
+
+ <img src="fedora_guest_setup/31.png">
+
+ <img src="fedora_guest_setup/32.png">
+
+ <img src="fedora_guest_setup/33.png">
+
+ <img src="fedora_guest_setup/34.png">
+
+ <img src="fedora_guest_setup/35.png">
+
+ <img src="fedora_guest_setup/36.png">
+
+ <img src="fedora_guest_setup/37.png">
+
+ <a name="postinstallation"><h2>Post Installation</h2></a>
+
+ <p>Grab the latest init4boot initramfs from
+ the <a href="http://sourceforge.net/project/showfiles.php?group_id=222073">Download</a>
+ page.</p>
+ <p>Grab the current system kernel from Fedora Core 9 (use another
+ installation or the kernel package.</p>
+ <p>Put both files into a new directory.  Additional you must put a
+ < href="fedora_guest_setup/fc9-gnu4u.sxp">Xen configuration file</a>
+ into this directory - and adapt it to your needs.</p>
+
+ <a name="systemadaptions"><h2>System Adaptions</h2></a>
+ <p>Some adaptions must be done to the new system.  These must be done
+ in single user mode.  So prepend an uppercase 'S' to
+ the <tt>extra</tt> line in the configuration file: <tt>extra="S
+ console=..."</tt> and boot up: <tt>xm create -c fc9-gnu4u.sxp</tt>.
+
+ <h3>init.d iscsid script</h3>
+ <p>After booting, edit the </tt>/etc/init.d/iscsid</tt>.  Add the
+ following lines in the start function:
+ <pre>
+		success
+		return
+	fi
+
+	if [ -f /etc/iscsi/iscsid.pid ] ; then
+            echo "Killing iscsid from boot"
+            kill `cat /etc/iscsi/iscsid.pid`
+            sleep 3
+            kill -9 `cat /etc/iscsi/iscsid.pid`
+            rm /etc/iscsi/iscsid.pid
+	fi
+
+	echo -n $"Starting iSCSI daemon: "
+ </pre>
+
+ <h3>Disable most services</h3>
+ <p>Most services are not needed, so they can be disabled (even some
+ might have problems when running within Xen).  Here is the list of
+ active services:</p>
+ <pre>
+# chkconfig | grep on
+anacron         0:off   1:off   2:off   3:off   4:off   5:off   6:off
+atd             0:off   1:off   2:off   3:on    4:on    5:on    6:off
+auditd          0:off   1:off   2:on    3:on    4:on    5:on    6:off
+cpuspeed        0:off   1:on    2:on    3:on    4:on    5:on    6:off
+crond           0:off   1:off   2:on    3:on    4:on    5:on    6:off
+fuse            0:off   1:off   2:off   3:on    4:on    5:on    6:off
+haldaemon       0:off   1:off   2:off   3:on    4:on    5:on    6:off
+ip6tables       0:off   1:off   2:on    3:on    4:on    5:on    6:off
+iptables        0:off   1:off   2:on    3:on    4:on    5:on    6:off
+irqbalance      0:off   1:off   2:off   3:on    4:on    5:on    6:off
+iscsid          0:off   1:off   2:on    3:on    4:on    5:on    6:off
+mdmonitor       0:off   1:off   2:on    3:on    4:on    5:on    6:off
+messagebus      0:off   1:off   2:on    3:on    4:on    5:on    6:off
+microcode_ctl   0:off   1:off   2:on    3:on    4:on    5:on    6:off
+netconsole      0:off   1:off   2:off   3:off   4:off   5:off   6:off
+netfs           0:off   1:off   2:off   3:on    4:on    5:on    6:off
+network         0:off   1:off   2:on    3:on    4:on    5:on    6:off
+nfslock         0:off   1:off   2:off   3:on    4:on    5:on    6:off
+restorecond     0:off   1:off   2:on    3:on    4:on    5:on    6:off
+rpcbind         0:off   1:off   2:on    3:on    4:on    5:on    6:off
+rpcgssd         0:off   1:off   2:off   3:on    4:on    5:on    6:off
+rpcidmapd       0:off   1:off   2:off   3:on    4:on    5:on    6:off
+rsyslog         0:off   1:off   2:on    3:on    4:on    5:on    6:off
+setroubleshoot  0:off   1:off   2:off   3:on    4:on    5:on    6:off
+sshd            0:off   1:off   2:on    3:on    4:on    5:on    6:off
+udev-post       0:off   1:on    2:on    3:on    4:on    5:on    6:off
+ </pre>
+
+ <h3>Installation of iscsi initiator</h3>
+ <p>You can install the iscsi initiator now:</p>
+<pre>
+# /etc/init.d/network start
+# /etc/init.d/ssh start
+</pre>
+<p>Then sftp to somewhere, get the package and install it.</p>
+
+ <h3>Config files via tftp</h3>
+ <p>If you need some special configuration (which you will, if using
+ multipath and iSCSI), there is a way to put these on a tftp server.
+ During boot these files are downloaded and extracted.  Have a look in
+ the contrib/tftp dir for an example.</p>
+
+ <a name="boot"><h2>Boot into new system</h2></a>
+ <p>Remove the 'S' from the extra line in the configuration file and
+ start over.</p>
+ 
+ <p>Happy Penguins are winking at you.</p>
+
+ <img src="fedora_guest_setup/38.png">
+
+ 
+</table>
+</body>
+</html>
+

@@ -6,6 +6,8 @@
 # For licensing details see COPYING
 #
 
+import os
+
 class udev:
 
     def __init__(self, config, opts):
@@ -77,14 +79,17 @@ fi
 
         class Copy:
             def output(self, c):
+                c.mkdir("lib/udev")
                 # From udevhelper and udev
                 c.log("Copy hotplug.functions")
-                c.copy("lib/udev/hotplug.functions", "lib/udev")
+                # This only exists on Debian4 (and not on FC9)
+                c.copy_if_exists("lib/udev/hotplug.functions", "lib/udev")
                 c.log("Copy ide.agent")
-                c.copy("lib/udev/ide.agent", "lib/udev")
+                # This only exists on Debian4 (and not on FC9)
+                c.copy_if_exists("lib/udev/ide.agent", "lib/udev")
                 c.log("Copy *_id progs")
-                c.cpln(".*_id", ["lib/udev", ], "lib/udev")
-
+                # Copied files are executables
+                c.copy_exec_re(".*_id", "lib/udev", "lib/udev")
                 # From udev only
                 c.log("Copy udef config files from etc")
                 c.copytree("etc/udev", "etc/udev")
@@ -94,5 +99,27 @@ fi
                 c.copy_exec("sbin/udevd")
                 c.copy_exec("sbin/udevtrigger")
                 c.copy_exec("sbin/udevsettle")
+
+                # Group is needed to not get
+                # lookup_group: specified group 'XXX' unknown
+                f = file(os.path.join(c.tmpdir, "etc/group"), "a")
+                f.write("""
+root:x:0:root
+tty:x:5:
+disk:x:6:root
+floppy:x:19:
+vcsa:x:69:
+uucp:x:14:uucp
+kmem:x:9:
+lp:x:7:daemon,lp
+""")
+                f.close()
+
+                f = file(os.path.join(c.tmpdir, "etc/passwd"), "a")
+                f.write("""
+vcsa:x:69:69:virtual console memory owner:/dev:/sbin/nologin
+""")
+                f.close()
+
 
         return Copy()

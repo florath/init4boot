@@ -1,0 +1,16 @@
+name="fc9-gnu4u"
+kernel="/xen/guests/fc9-install/vmlinuz"
+ramdisk="/xen/guests/fc9-install/initrd.img"
+memory=512
+vcpus=1
+on_poweroff = "destroy"
+on_reboot = "restart"
+on_crash = "restart"
+vfb = [ "type=vnc,vncunused=1" ]
+vif = [ "mac=72:E0:00:00:00:24,bridge=xenbr777",
+        "mac=72:E1:00:00:00:24,bridge=xenbr767",
+        "mac=72:E2:00:00:00:24,bridge=xenbr787",
+        "mac=72:E4:00:00:00:24,bridge=xenbr807"]
+uuid="7d605001-b642-421d-91b3-d9a3eed48fb0"
+extra="console=xvc0 text" 
+

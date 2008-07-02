@@ -92,8 +92,8 @@ fi
             def output(self, c):
                 c.copy_exec("sbin/multipath")
                 c.copy_exec("sbin/kpartx")
-                c.copy_exec("sbin/devmap_name")
-                c.copy_exec("sbin/dmsetup")
+                c.copy_exec_w_path("devmap_name", ["sbin", ])
+                c.copy_exec_w_path("dmsetup", ["sbin", ])
                 # Not available in Debian stable
                 # (Part of kpartx package which is only available in unstable)
                 #                c.copy("lib/udev/dmsetup_env", "lib/udev")
@@ -102,9 +102,9 @@ fi
                 # Not in multipath stable
                 # c.copy_exec("sbin/mpath_prio_hp_sw")
                 # c.copy_exec("sbin/mpath_prio_rdac")
-                c.copy_exec("sbin/mpath_prio_netapp")
-                c.copy_exec("sbin/mpath_prio_random")
+                c.copy_exec_w_path("mpath_prio_netapp", ["sbin", ])
+                c.copy_exec_w_path("sbin/mpath_prio_random", ["sbin", ])
                 c.copy_exec("sbin/mpath_prio_hds_modular")
-                c.copy_exec("sbin/mpath_prio_balance_units")
+                c.copy_exec_w_path("mpath_prio_balance_units", ["sbin", ])
 
         return Copy()

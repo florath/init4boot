@@ -1,0 +1,30 @@
+
+Readme for Fedora
+=================
+
+Before running the i4b-mkinitramfs script, install the following
+packages (as of Fedora9):
+
+iscsi-initiator-utils-6.2.0.868-0.7.fc9
+busybox-1.9.1-1.fc9
+
+device-mapper-multipath must be updated to at least
+version device-mapper-multipath-0.4.7-16.fc9.
+
+(If you forget to update, you will get segmentation faults from
+multipath.) [device-mapper-multipath-0.4.7-16.fc9 depends itself on 
+kpartx-0.4.7-16.fc9 which also must be update.] 
+
+Also libsysfs must be updated to at least version
+libsysfs-2.1.0-4.fc9.
+
+Download klibc-1.4.34: 
+> cd klibc-1.4.34/usr/kinit/run-init
+> gcc -Wall -O2 -o run-init *.c
+Put this to somwehre
+
+vi ./blkid/blkid.tab
+Change /dev/sawhatever to /dev/mapper/fc9-whatever
+
+XXX ToDo: Example tftp file.
+

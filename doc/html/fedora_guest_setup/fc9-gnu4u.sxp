@@ -1,0 +1,15 @@
+name="fc9-gnu4u"
+kernel="/xen/guests/fc9-real/vmlinuz-2.6.25-2.fc9.i686.xen"
+ramdisk="/xen/guests/fc9-real/init4boot.img"
+memory=512
+vcpus=4
+on_poweroff = "destroy"
+on_reboot = "restart"
+on_crash = "restart"
+vfb = [ "type=vnc,vncunused=1" ]
+vif = [ "mac=72:E0:00:00:00:26,bridge=xenbr777",
+        "mac=72:E1:00:00:00:26,bridge=xenbr767",
+        "mac=72:E2:00:00:00:26,bridge=xenbr787",
+        "mac=72:E4:00:00:00:26,bridge=xenbr807"]
+uuid="73f29763-a08c-41b9-b94b-7b2c0aee6dff"
+extra="console=xvc0 nw=eth3:dhcp rfs=iscsi:localiqn=iqn.2008-02.de.flonatel:00036;portals=192.168.228.20,192.168.228.21;path=/dev/mapper/fc9-gnu4u-root1 bv=multipath,tftp hostid=fc9-gnu4u tftp=192.168.228.25"

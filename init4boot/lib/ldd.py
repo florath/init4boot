@@ -27,7 +27,7 @@ import os
 #
 def ldd_single(prog):
     rlist = []
-    needre = re.compile("  NEEDED      (\S*).*")
+    needre = re.compile("  NEEDED\s*(\S*).*")
     cout, cin = popen2.popen2("objdump -p %s" % prog)
     for l in cout:
         m = needre.match(l)

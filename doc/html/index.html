@@ -4,7 +4,7 @@
 <head>
 <meta name="description" content="init4boot - create an advanced initramfs">
 <meta name="author" content="flonatel GmbH & Co. KG">
-<meta name="keywords" content="iscsi, boot, debian, xen, initramfs, init">
+<meta name="keywords" content="iscsi, boot, debian, fedora, xen, initramfs, init">
 <meta name="date" content="2001-12-15T08:49:37+02:00">
 <title>i4b - init4boot</title>
 </head>
@@ -46,6 +46,7 @@
   <li>Support of boot varaints: udev, multipath, tftp config,
       network</li>
   <li>Supports Bare Metal booting and Guest System with Xen</li>
+  <li>Tested on Debian 4 and Fedora Core 9</li>
   </ul>
  <a name="project"><h2>Project</h2></a>
  <p>The project is <a href="http://sourceforge.net/projects/init4boot/">hosted
@@ -54,21 +55,43 @@ bug-tracker, news and forums.</p>
  <a name="releases"><h2>Releases</h2></a>
  <table border=1>
  <tr><th>Version</th><th>Date</th><th>Comments</th></tr>
+ <tr><td>0.3</td><td>2008-07-02</td><td>Port to Fedora Core 9</td></tr>
  <tr><td>0.2</td><td>2008-05-03</td><td>Build on stable, updated documentation</td></tr>
  <tr><td>0.1</td><td>2008-04-18</td><td>Added man pages and documentation</td></tr>
  <tr><td>0.0.2</td><td>2008-04-04</td><td>Added support for bare metal booting</td></tr>
  <tr><td>0.0.1</td><td>2008-03-31</td><td>Initial release</td></tr>
  </table>
  <a name="state"><h2>State</h2></a>
- <p>The current state of the project is alpha.  Currently it works,
+ <p>The current state of the project is beta.  Currently it works,
  but was only tested in a Xen iSCSI environment and on a very limited set of bare metal environments.</p>
+ <p>First computers are up and running for over 80 days - booted with
+ init4boot.  There were some hunderets of successfull boots with init4boot.</p>
  <a name="documentation"><h2>Documentation</h2></a>
- <p>There are two documents available:
+ <p>There are three different kinds of documentation:</p>
+ <h3>What's about? Why? How?</h3>
+ <p>The current <a href="XXX">Design and Requirements</a>
+ document.</p>
+ <h3>Typical normal users</h3>
+ <p>One major advantage is, that there is only one <em>init4boot</em>
+ initramfs for one distribution.  So it is possible to distribute the
+ initramfs.  There is no need that everybody builds up their
+ own. Currently there are versions for Debian 4 and Fedora Core
+ 9.</p>
+ <p>For Debian there are up to date man pages.  So install the package
+ and read them.</p>
+ <p>For Fedora there is a small 
+   <a href="fedora_guest_setup.html">Howto setup a Fedora Core 9
+  guest system</a> available.</p>
+ <h3>Admins, Developers and other Mads</h3>
+ <p>If you want to create your own initramfs or want to extend the
+ functionalaty, read the Readmes:</p>
  <ul>
-  <li><a href="http://init4boot.svn.sourceforge.net/viewvc/init4boot/trunk/Readme.txt?revision=5&view=markup">Readme.txt</a> from the source</li>
-  <li><a href="i4b-reqdesign-08.pdf">Requirements and Design</a> as a PDF.
- </ul>
- <p>Additionally in the package itself there are some man pages explaining the usage and paramters in detail.</p>
+  <li><a href="http://init4boot.svn.sourceforge.net/viewvc/init4boot/trunk/Readme.txt?revision=5&view=markup">Readme.txt</a>
+  from the source</li>
+  <li><a href="http://init4boot.svn.sourceforge.net/viewvc/init4boot/trunk/Readme.txt?revision=5&view=markup">Readme.Fedora</a>
+  from the source</li>
+</ul>
+
  <p>Additional there exists the a <a href="http://init4boot.svn.sourceforge.net/viewvc/init4boot/trunk/doc/boot.log?revision=10&view=markup">log file</a> from a 
 typical boot process from a Xen Guest System with a multipath iSCSI
 root device.</p>
@@ -77,6 +100,7 @@ root device.</p>
 </span>
  </td>
 </tr>
+</table>
 
 </body>
 </html>

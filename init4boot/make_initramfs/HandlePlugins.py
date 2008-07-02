@@ -74,11 +74,24 @@ class HandlePlugins:
                     else:
                         shutil.copy2(fp_src, fp_dest)
 
+    def mkdir(self, destdir):
+        destpath = os.path.join(self.tmpdir, destdir)
+        if not os.path.isdir(destpath):
+            os.makedirs(destpath)
+
     def copy(self, source, destdir):
         destpath = os.path.join(self.tmpdir, destdir)
         if not os.path.isdir(destpath):
             os.makedirs(destpath)
         shutil.copy2(os.path.join(self.opts.root_dir, source), destpath)
+
+    # Some files are only available on some distributions
+    def copy_if_exists(self, source, destdir):
+        sourcepath = os.path.join(self.opts.root_dir, source)
+        if os.path.exists(sourcepath):
+            self.copy(source, destdir)
+        else:
+            print "+++ Ignoging non-existant file='%s'" % sourcepath
 
     def copytree(self, src, dst, regexp=".*"):
         fre = re.compile(regexp)
@@ -104,8 +117,8 @@ class HandlePlugins:
                       (`srcname`, `dstname`, str(why))    
 
     # Source is in root_dir, dest in tmp dir
-    def copy_exec(self, source_file):
-        destdir = os.path.join(self.tmpdir, "bin")
+    def copy_exec(self, source_file, ddir="bin"):
+        destdir = os.path.join(self.tmpdir, ddir)
         if not os.path.exists(destdir):
             os.makedirs(destdir)
         if source_file[0] == "/":
@@ -129,7 +142,27 @@ class HandlePlugins:
             if not os.path.exists(destdir):
                 os.makedirs(destdir)
             shutil.copy2(lib, destlib)
-                    
+
+    # Copy all executables from one dir - specified by a regexp - to
+    # another dir
+    def copy_exec_re(self, filere, source_dir, dest_dir):
+        lre = re.compile(filere)
+        source_path = os.path.join(self.opts.root_dir, source_dir)
+        dest_path = os.path.join(self.tmpdir, dest_dir)
+        
+        for d in os.listdir(source_path):
+            if lre.match(d):
+                self.copy_exec(os.path.join(source_dir, d), dest_dir)
+
+    def copy_exec_w_path(self, source_file, path):
+        if source_file[0] == "/":
+            source_file = source_file[1:]
+        for p in path:
+            spath = os.path.join(self.opts.root_dir, p, source_file)
+            if os.path.exists(spath):
+                self.copy_exec(spath)
+                return
+        print "*** File '%s' not found in '%s'" % (source_file, path)
 
     def create_initramfs(self):
         # Read in all the plugins

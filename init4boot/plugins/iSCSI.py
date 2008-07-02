@@ -40,6 +40,7 @@ if [ "${boot_type}" = "iscsi" ]; then
   modprobe -q sd_mod
   modprobe -q iscsi_tcp
   eval ${boot_args}
+  maybe_break iscsi
 
   log "Starting iscsid"
   mkdir -p /etc/iscsi
@@ -92,18 +93,28 @@ logpe
 
         class Copy:
             def output(self, c):
-                c.copy_exec("usr/sbin/iscsid")
-                c.copy_exec("usr/bin/iscsiadm")
+                c.copy_exec_w_path("iscsid", ["usr/sbin", "sbin"])
+                c.copy_exec_w_path("iscsiadm", ["usr/sbin", "sbin"])
 
                 c.copytree(os.path.join(c.opts.root_dir, "lib"),
                            os.path.join(c.tmpdir, "lib"), "libnss_.*")
+
+                # On fedora /var/lib/iscsi is needed
+                vli = os.path.join(c.opts.root_dir, "var/lib/iscsi")
+                if os.path.exists(vli):
+                    c.copytree(vli, 
+                               os.path.join(c.tmpdir, "var/lib/iscsi"), ".*")
 
                 # The password file is needed.
                 # (If not, the error
                 #   'peeruser_unix: unknown local user with uid 0'
                 # occurs.)
-                f = file(os.path.join(c.tmpdir, "etc/passwd"), "w")
+                f = file(os.path.join(c.tmpdir, "etc/passwd"), "a")
                 f.write("root:x:0:0:root:/root:/bin/bash\n")
                 f.close()
+
+                ddir = os.path.join(c.tmpdir, "var/run")
+                if not os.path.exists(ddir):
+                    os.makedirs(ddir)
 
         return Copy()
