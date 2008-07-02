@@ -6,7 +6,7 @@
 # For licensing details see COPYING
 #
 
-I=init4boot-0.2
+I=init4boot-0.3
 
 PYSETUP = python setup.py
 
