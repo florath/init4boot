@@ -1,0 +1,4 @@
+
+* clean up the run-init
+  - under Fedora there seams no run-init at all
+  - under Debian the run-init is the only executable which uses the klibc

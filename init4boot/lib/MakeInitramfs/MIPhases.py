@@ -18,6 +18,10 @@ class MIPhases:
         self.desc[self.Copy] = ("Copy", "Copies over the data")
 
         stage_cnt+=1
+        self.Create = stage_cnt
+        self.desc[self.Create] = ("Create", "Creates the initramfs")
+
+        stage_cnt+=1
         self.Cleanup = stage_cnt
         self.desc[self.Cleanup] = ("Cleanup",
                                    "Clean up everything - removes tmp files")

@@ -264,6 +264,7 @@ depmod -a
 # to deal with removable devices
 if [ ! -e "${path}" ] || ! $(get_fstype "${path}" >/dev/null); then
   log "Waiting for root file system..."
+  maybe_break wait_for_root
 
   # Default delay is 180s
   if [ -z "${clp_rootdelay}" ]; then
@@ -360,6 +361,7 @@ if [ -n ${debug} ]; then
 fi
 
 # Chain to real filesystem
+maybe_break run_init
 exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
 panic "Could not execute run-init."
 """)
@@ -439,7 +441,6 @@ panic "Could not execute run-init."
                 destdir = os.path.dirname(dest)
                 if not os.path.exists(destdir):
                     os.makedirs(destdir)
-                print "DDDDDD %s" % dest
                 os.symlink("/bin/busybox", dest)
                 self.make_busybox_links(c)
         
@@ -466,24 +467,37 @@ panic "Could not execute run-init."
                 c.copy_exec("/sbin/rmmod")
 
                 # Only for debugging
-                c.copy_exec("/usr/bin/strace")
-                c.copy_exec("/usr/bin/nc")
+                #c.copy_exec("/usr/bin/strace")
+                #c.copy_exec("/usr/bin/nc")
 
                 # HACK!
+                # XXX I think, this was needed for Fedora
                 if os.path.exists("/tmp/run-init"):
                     c.copy_exec("/tmp/run-init")
+
+                # For Debian
+                if os.path.exists("/usr/lib/klibc/bin/run-init"):
+                    c.copy_exec("/usr/lib/klibc/bin/run-init")
+                    c.copy("/lib/klibc--IOwh0VR87LX1LY95rmnFLc1vuY.so", "lib")
 
                 # HACK!
                 os.symlink("/lib", os.path.join(c.tmpdir, "lib64"))
 
                 os.symlink("/bin", os.path.join(c.tmpdir, "sbin"))
 
+        return Copy(self.opts)
+    
+    def mi_Create(self):
+
+        class Create:
+
+            def __init__(self, opts):
+                self.opts = opts
+
+            def output(self, c):
                 c.log("Creating cpio archive")
                 os.system("P=$PWD && cd %s &&  find . | " \
                           "cpio --quiet -o -H newc | gzip >$P/%s"
                           % (c.tmpdir, self.opts.output_file))
 
-        return Copy(self.opts)
-    
-
-    
+        return Create(self.opts)

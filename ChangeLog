@@ -1,3 +1,34 @@
+2009-06-17  Andreas Florath  <sf@flonatel.org>
+
+	* init4boot/make_initramfs/HandlePlugins.py: added ln.
+
+	* init4boot/make_initramfs/Options.py: added additional help
+	text. 
+
+	* init4boot/lib/MakeInitramfs/MIPhases.py: added new phase for
+	writing the (cpio) archive.
+
+	* init4boot/plugins/multipath.py: adapted to new mpath_ binaries.
+
+	* init4boot/plugins/udev.py: adapted to new udev release.
+
+	* ToDo: added
+
+	* init4boot/plugins/Generic.py: added additional stage for
+	really writing the (cpio) archive.
+
+	* init4boot/plugins/iSCSI.py: iscsiadm is now under /usr/bin for
+	Debian stable.
+
+	* init4boot/plugins/lvm2md.py: added (for handling lvm2 over md
+	over lvm2 over md over lvm2 over md).
+
+	* init4boot/plugins/lvm2.py: added (for lvm2 support).
+
+	* init4boot/plugins/md.py: added (for md support).
+
+	* Readme.Debian: added.
+
 2008-05-03  Andreas Florath  <sf@flonatel.org>
 
 	* debian/control, debian/rules: Added doc and client package.

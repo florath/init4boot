@@ -22,12 +22,12 @@ class udev:
                 ofile.write("""
 if check_bv "udev"; then
   logp "Handling udev"
-  echo > /proc/sys/kernel/hotplug
+  echo > /sys/kernel/uevent_helper
   mkdir -p /dev/.udev/db/
   udevd --daemon
-  mkdir -p /dev/.udev/queue/
-  udevtrigger
-  udevsettle || true
+  mkdir -p /dev/.udev/queue/ /dev/.udev/rules.d/
+  udevadm trigger
+  udevadm settle || true
   logpe
 fi
 """)
@@ -46,21 +46,7 @@ if check_bv "udev"; then
     [ "$(readlink $proc/exe)" != /sbin/udevd ] || kill ${proc#/proc/}
   done
 
-  # ignore any failed event because the init script will trigger
-  # again all events
-  nuke /dev/.udev/queue/
-
-  # Optionally move the real filesystem's /dev to beneath our tmpfs
-  if [ -e /etc/udev/udev.conf ]; then
-    . /etc/udev/udev.conf
-  fi
-  if [ -z "$no_static_dev" ]; then
-    mkdir -m 0700 -p /dev/.static/
-    mkdir /dev/.static/dev/
-    mount -n -o bind $rootmnt/dev /dev/.static/dev
-  fi
-
-  # Now move it all to the real filesystem
+  # move the /dev tmpfs to the rootfs
   mount -n -o move /dev $rootmnt/dev
 
   # create a temporary symlink to the final /dev for other initramfs scripts
@@ -97,8 +83,7 @@ fi
                 # WHY: rm -f $DESTDIR/etc/udev/rules.d/*_cd-aliases-generator.rules
                 c.log("Copy used binaries")
                 c.copy_exec("sbin/udevd")
-                c.copy_exec("sbin/udevtrigger")
-                c.copy_exec("sbin/udevsettle")
+                c.copy_exec("sbin/udevadm")
 
                 # Group is needed to not get
                 # lookup_group: specified group 'XXX' unknown

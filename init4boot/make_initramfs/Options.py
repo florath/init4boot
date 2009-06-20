@@ -1,5 +1,5 @@
 #
-# (c) 2008 by flonatel
+# (c) 2008-2009 by flonatel
 #
 # For licencing details see COPYING
 #
@@ -26,6 +26,7 @@ class Options:
 
         if self.options.output_file == None:
             print "*** Error: option output is missing"
+            print "***        try '-h' for help"
             sys.exit(1)
 
         if self.options.root_dir == None:
@@ -33,5 +34,5 @@ class Options:
             self.options.root_dir = ""
             
         if self.options.plugins_dir == None:
-            self.options.plugins_dir = "/usr/share/pycentral/init4boot/site-packages"
+            self.options.plugins_dir = "/usr/share/pyshared"
             

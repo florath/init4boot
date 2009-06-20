@@ -1,5 +1,5 @@
 #
-# (c) 2008 by flonatel
+# (c) 2008-2009 by flonatel
 #
 # For licencing details see COPYING
 #
@@ -84,6 +84,10 @@ class HandlePlugins:
         if not os.path.isdir(destpath):
             os.makedirs(destpath)
         shutil.copy2(os.path.join(self.opts.root_dir, source), destpath)
+
+    def ln(self, source, destdir):
+        destpath = os.path.join(self.tmpdir, destdir)
+        os.symlink(source, destpath)
 
     # Some files are only available on some distributions
     def copy_if_exists(self, source, destdir):

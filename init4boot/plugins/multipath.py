@@ -1,7 +1,7 @@
 #
 # multipath iSCSI plugin
 #
-# (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2008-2009 by flonatel (sf@flonatel.org)
 #
 # For licensing details see COPYING
 #
@@ -97,14 +97,14 @@ fi
                 # Not available in Debian stable
                 # (Part of kpartx package which is only available in unstable)
                 #                c.copy("lib/udev/dmsetup_env", "lib/udev")
+
                 c.copy_exec("sbin/mpath_prio_alua")
-                c.copy_exec("sbin/mpath_prio_emc")
-                # Not in multipath stable
-                # c.copy_exec("sbin/mpath_prio_hp_sw")
-                # c.copy_exec("sbin/mpath_prio_rdac")
-                c.copy_exec_w_path("mpath_prio_netapp", ["sbin", ])
-                c.copy_exec_w_path("sbin/mpath_prio_random", ["sbin", ])
-                c.copy_exec("sbin/mpath_prio_hds_modular")
                 c.copy_exec_w_path("mpath_prio_balance_units", ["sbin", ])
+                c.copy_exec("sbin/mpath_prio_emc")
+                c.copy_exec("sbin/mpath_prio_hds_modular")
+                c.copy_exec("sbin/mpath_prio_hp_sw")
+                c.copy_exec_w_path("mpath_prio_netapp", ["sbin", ])
+                c.copy_exec_w_path("mpath_prio_random", ["sbin", ])
+                c.copy_exec("sbin/mpath_prio_rdac")
 
         return Copy()

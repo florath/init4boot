@@ -1,7 +1,7 @@
 #
 # init4boot iSCSI plugin
 #
-# (c) 2008 by flonatel
+# (c) 2008-2009 by flonatel
 #
 # For licencing details see COPYING
 #
@@ -94,7 +94,7 @@ logpe
         class Copy:
             def output(self, c):
                 c.copy_exec_w_path("iscsid", ["usr/sbin", "sbin"])
-                c.copy_exec_w_path("iscsiadm", ["usr/sbin", "sbin"])
+                c.copy_exec_w_path("iscsiadm", ["usr/sbin", "sbin", "usr/bin"])
 
                 c.copytree(os.path.join(c.opts.root_dir, "lib"),
                            os.path.join(c.tmpdir, "lib"), "libnss_.*")

@@ -1,3 +1,17 @@
+init4boot (0.4) unstable; urgency=low
+
+  * Port to Debian 5.0
+
+  * Add support for lvm2 and md
+
+ -- Andreas Florath <sf@flonatel.org>  Sat, 11 May 2008 11:22:12 +0200
+
+init4boot (0.3) unstable; urgency=low
+
+  * Port to Fedora 
+
+ -- Andreas Florath <sf@flonatel.org>  Sat, 11 May 2008 11:22:12 +0200
+
 init4boot (0.2) unstable; urgency=low
 
   * Build on stable

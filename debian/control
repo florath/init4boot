@@ -2,7 +2,7 @@ Source: init4boot
 Maintainer: Andreas Florath <sf@flonatel.org>
 Section: python
 Priority: standard
-Build-Depends: debhelper (>= 5), python (>=2.3.5-7), python-dev (>=2.3.5-7), python-central, python-docutils
+Build-Depends: debhelper (>= 5), python (>=2.3.5-7), python-dev (>=2.3.5-7), python-central, python-docutils, binutils, multipath-tools, open-iscsi, busybox-static
 Standards-Version: 3.7.3
 XB-Python-Version: ${python:Versions}
 XS-Python-Version: current
