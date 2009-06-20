@@ -1,12 +1,12 @@
 #
 # Makefile for init4boot
 #
-# (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2008-2009 by flonatel (sf@flonatel.org)
 #
 # For licensing details see COPYING
 #
 
-I=init4boot-0.3
+I=init4boot-0.4
 
 PYSETUP = python setup.py
 
