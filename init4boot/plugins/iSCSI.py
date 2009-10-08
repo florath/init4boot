@@ -46,15 +46,16 @@ if [ "${boot_type}" = "iscsi" ]; then
   mkdir -p /etc/iscsi
   echo "InitiatorName=$localiqn" >/etc/iscsi/initiatorname.iscsi
   # Start iscsid with -f which logs to stdout / stderr instead of
-  # syslog (which is not available at this time).
+  # syslog (which is not available at the time of boot).
   /bin/iscsid -d 0 -f >/tmp/iscsid-stdout.log 2>/tmp/iscsid-stderr.log &
   echo $! >/etc/iscsi/iscsid.pid
 
-  log "Login at all iSCSI ports"
-  one_portal_reached=false
-  for portal in `echo ${portals} | tr "," " "` ; do 
-    alltargets=`iscsiadm -m discovery -t sendtargets -p ${portal}| tr " " "%"` 
-    if [ $? -eq 0 ] ; then 
+  if [ -n "${portals}" ]; then
+    log "Login to all iSCSI portals"
+    one_portal_reached=false
+    for portal in `echo ${portals} | tr "," " "` ; do 
+      alltargets=`iscsiadm -m discovery -t sendtargets -p ${portal}| tr " " "%"` 
+      if [ $? -eq 0 ] ; then 
         log "Discovered iSCSI portal at ${portal} with targets=${alltargets}"
         one_portal_reached=true
         for ats in ${alltargets}; do
@@ -63,10 +64,14 @@ if [ "${boot_type}" = "iscsi" ]; then
             log "Login into port ${port} at target ${target}"
             iscsiadm -m node -T $target -p $port -l
         done
-    fi 
-  done
-  if [ "false" = "${one_portal_reached}" ]; then
-        panic "No iSCSI portal reachable"
+      fi 
+    done
+    if [ "false" = "${one_portal_reached}" ]; then
+          panic "No iSCSI portal reachable"
+    fi
+  else
+    log "Login to all targets which are marked automatically"
+    iscsiadm -m node -L automatic
   fi
   logpe
 fi

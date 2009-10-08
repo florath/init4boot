@@ -9,7 +9,7 @@ XS-Python-Version: current
 
 Package: init4boot
 Architecture: all
-Depends: ${python:Depends}
+Depends: ${python:Depends}, debhelper (>= 5), python (>=2.3.5-7), python-dev (>=2.3.5-7), python-central, python-docutils, binutils, multipath-tools, open-iscsi, busybox-static
 XB-Python-Version: ${python:Versions}
 Description: Creates init script and initramfs.
  init4boot is a set of utilities to create an initramfs and 

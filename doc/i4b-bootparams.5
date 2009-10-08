@@ -16,15 +16,15 @@
 .\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .\" GNU General Public License for more details.
 .\"
-.\" (c) 2008 by flonatel (sf@flonatel.org)
+.\" (c) 2008-2009 by flonatel (sf@flonatel.org)
 .\"
-.TH i4b-bootparams 5 2008-04-04 "Linux" "Linux booting"
+.TH i4b-bootparams 5 2009-10-07 "Linux" "Linux booting"
 .SH NAME
 i4b-bootparams \- boot up parameter handling
 .SH DESCRIPTION
 Some special parameters are needed to control the behavoiur when
 booting from a initramfs created by 
-.B i4b-makeinitramfs.
+.B i4b-mkinitramfs.
 .SH OVERVIEW
 When a Linux system is booted, some command line parameters are
 passed to the kernel.  Typically some of them are handled in the
@@ -138,7 +138,8 @@ type:
 - The IQN of the system to start up.
 .P
 .B portals
-- A comma separated list of iSCSI target portals.
+- A comma separated list of iSCSI target portals. If not specified,
+all automatically tagged available iSCSI targets are used.
 .P
 .B path
 - The path to the root device.
@@ -186,15 +187,20 @@ until you are realy sure what you are doing.
 Nowadays there seems no reason why 'udev' should not be used, and for
 the multipath boot variant, udev is mandatory.  You should think twice
 before not using this.
+.SH BOOT VARIANT 'lvm2'
+When using lvm2 volumes, this boot variant must be added.
+.SH BOOT VARIANT 'md'
+When using (software) RAID with Linux md, this boot variant must be
+added.
 .SH "SEE ALSO"
 .B init4boot(7)
 - Overview over the different aspects of the init4boot package.
 .P
-.B i4b-makeinitramfs(1)
+.B i4b-mkinitramfs(1)
 - tool for creating an initramfs
 .SH AUTHOR
 Written by Andreas Florath (sf@flonatel.org)
 .SH COPYRIGHT
-Copyright \(co 2008 by flonatel (sf@flonatel.org).
+Copyright \(co 2008-2009 by flonatel (sf@flonatel.org).
 License GPLv3+: GNU GPL version 3 or later
 

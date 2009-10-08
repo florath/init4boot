@@ -18,12 +18,12 @@
 .\"
 .\" (c) 2008 by flonatel (sf@flonatel.org)
 .\"
-.TH i4b-syssetup 5 2008-05-03 "Linux" "Linux booting"
+.TH i4b-syssetup 5 2009-10-07 "Linux" "Linux booting"
 .SH NAME
 i4b-syssetup \- set up system to create initramfs
 .SH DESCRIPTION
 There is the need for some special preparations to run the 
-.B i4b-makeinitramfs
+.B i4b-mkinitramfs
 command.  
 .SH OVERVIEW
 There are three possibilities to set up a system for initramfs creation:
@@ -61,14 +61,14 @@ gcc (for determination of the system type only)
 This is the easiest way to use.  Just use the data from the current
 system and create a initramfs from this.
 To use this, use '-r /' as parameter to the
-.B i4b-makeinitramfs
+.B i4b-mkinitramfs
 program.
 .SH "COPY OVER"
 Install some system, and copy over the directories
 .B /sbin /bin /etc
 to a directory on the build system.  Then specify this directory with
 the -r parameter to 
-.B i4b-makeinitramfs
+.B i4b-mkinitramfs
 .SH "DEBOOTSTRAP"
 Use debootstrap (or a similar thing for your distribution) to install
 a new system in a directory.  Also install the packages (typically
@@ -78,11 +78,11 @@ with fakeroot) described in section
 .B init4boot(7)
 - Overview over the different aspects of the init4boot package.
 .P
-.B i4b-makeinitramfs(1)
+.B i4b-mkinitramfs(1)
 - tool for creating an initramfs
 .SH AUTHOR
 Written by Andreas Florath (sf@flonatel.org)
 .SH COPYRIGHT
-Copyright \(co 2008 by flonatel (sf@flonatel.org).
+Copyright \(co 2008-2009 by flonatel (sf@flonatel.org).
 License GPLv3+: GNU GPL version 3 or later
 

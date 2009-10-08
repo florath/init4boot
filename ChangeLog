@@ -1,3 +1,11 @@
+2009-10-07  Andreas Florath  <florath@ormr.bn.detemobil.de>
+
+	* init4boot/plugins/iSCSI.py: added support when no portals
+	are specified.
+
+	* doc/RequirementsDesign.odt: added requirements for handling
+	iSCSI boot without specifying the portals.
+
 2009-06-17  Andreas Florath  <sf@flonatel.org>
 
 	* init4boot/make_initramfs/HandlePlugins.py: added ln.

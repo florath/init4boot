@@ -443,6 +443,13 @@ panic "Could not execute run-init."
                     os.makedirs(destdir)
                 os.symlink("/bin/busybox", dest)
                 self.make_busybox_links(c)
+
+            def get_klibc_name(self):
+                files = os.listdir("/lib")
+                for f in files:
+                    if f.startswith("klibc-"):
+                        return "/lib/" + f
+                return None
         
             def output(self, c):
                 self.create_sysdirs(c)
@@ -478,7 +485,12 @@ panic "Could not execute run-init."
                 # For Debian
                 if os.path.exists("/usr/lib/klibc/bin/run-init"):
                     c.copy_exec("/usr/lib/klibc/bin/run-init")
-                    c.copy("/lib/klibc--IOwh0VR87LX1LY95rmnFLc1vuY.so", "lib")
+                    # Have a look for the full pathname of the klibc
+                    # (which changes from release to release and from
+                    # architecture to architecture).
+                    klibcname = self.get_klibc_name()
+                    if klibcname:
+                        c.copy(klibcname, "lib")
 
                 # HACK!
                 os.symlink("/lib", os.path.join(c.tmpdir, "lib64"))

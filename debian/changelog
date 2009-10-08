@@ -1,3 +1,9 @@
+init4boot (0.5) unstable; urgency=low
+
+  * Add support for iSCSI boot without specifying the portals
+
+ -- Andreas Florath <sf@flonatel.org>  Sat, 07 Oct 2008 22:22:12 +0200
+
 init4boot (0.4) unstable; urgency=low
 
   * Port to Debian 5.0
