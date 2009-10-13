@@ -6,4 +6,4 @@ Before running the i4b-mkinitramfs script from source tar ball or to
 create the debian package, install the following packages (as of
 Debian 5.0.1): 
 
-binutils multipath-tools open-iscsi busybox-static debhelper
+binutils multipath-tools open-iscsi busybox-static debhelper lvm2 mdadm
