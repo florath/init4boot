@@ -10,6 +10,11 @@ Happy booting
 Andreas Florath
 sf@flonatel.org
 
+===========================================================================
+
+IMPORTANT NOTE:
+
+The NFS root feature is currently experimental.
 
 ===========================================================================
 

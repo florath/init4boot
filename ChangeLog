@@ -1,4 +1,14 @@
-2009-10-07  Andreas Florath  <florath@ormr.bn.detemobil.de>
+2009-10-13  Andreas Florath  <sf@flonatel.org>
+
+	* init4boot/plugins/nfs.py: added.
+
+	* doc/RequirementsDesign.odt: added requirements for nfs root file
+	system. 
+
+	* doc/i4b-bootparams.5: added specifications for nfs root file
+	system.
+
+2009-10-07  Andreas Florath  <sf@flonatel.org>
 
 	* init4boot/plugins/iSCSI.py: added support when no portals
 	are specified.

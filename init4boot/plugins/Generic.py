@@ -42,6 +42,7 @@ class Generic:
 verbose=1
 break="never"
 clp_bv=""
+clp_use_std_mount="1"
 log()
 {
   [ "${verbose}" = "0" ] && return
@@ -260,61 +261,63 @@ depmod -a
         class MountRoot:
             def pre_output(self, ofile):
                 ofile.write("""
-# If the root device hasn't shown up yet, give it a little while
-# to deal with removable devices
-if [ ! -e "${path}" ] || ! $(get_fstype "${path}" >/dev/null); then
-  log "Waiting for root file system..."
-  maybe_break wait_for_root
+if [ ${clp_use_std_mount} = "1" ]; then
+  # If the root device hasn't shown up yet, give it a little while
+  # to deal with removable devices
+  if [ ! -e "${path}" ] || ! $(get_fstype "${path}" >/dev/null); then
+    log "Waiting for root file system..."
+    maybe_break wait_for_root
 
-  # Default delay is 180s
-  if [ -z "${clp_rootdelay}" ]; then
-    slumber=180
-  else
-    slumber=${clp_rootdelay}
-  fi
-  if [ -x /sbin/usplash_write ]; then
-    /sbin/usplash_write "TIMEOUT ${slumber}" || true
+    # Default delay is 180s
+    if [ -z "${clp_rootdelay}" ]; then
+      slumber=180
+    else
+      slumber=${clp_rootdelay}
+    fi
+    if [ -x /sbin/usplash_write ]; then
+      /sbin/usplash_write "TIMEOUT ${slumber}" || true
+    fi
+
+    slumber=$(( ${slumber} * 10 ))
+    while [ ! -e "${path}" ] \
+            || ! $(get_fstype "${path}" >/dev/null); do
+      /bin/sleep 0.1
+      slumber=$(( ${slumber} - 1 ))
+      [ ${slumber} -gt 0 ] || break
+    done
+
+    if [ -x /sbin/usplash_write ]; then
+      /sbin/usplash_write "TIMEOUT 15" || true
+    fi
   fi
 
-  slumber=$(( ${slumber} * 10 ))
-  while [ ! -e "${path}" ] \
-          || ! $(get_fstype "${path}" >/dev/null); do
-    /bin/sleep 0.1
-    slumber=$(( ${slumber} - 1 ))
-    [ ${slumber} -gt 0 ] || break
+  # We've given up, but we'll let the user fix matters if they can
+  while [ ! -e "${path}" ]; do
+    echo "ALERT!  ${path} does not exist.  Dropping to a shell!"
+    echo "  Check your root= boot argument (cat /proc/cmdline)"
+    panic " Check for missing modules (cat /proc/modules), or device files (ls /dev)"
   done
 
-  if [ -x /sbin/usplash_write ]; then
-    /sbin/usplash_write "TIMEOUT 15" || true
+  # Get the root filesystem type if not set
+  if [ -z "${clp_rootfstype}" ]; then
+    fstype=$(get_fstype "${path}")
+  else
+    fstype=${clp_rootfstype}
   fi
+
+  if [ "${clp_readonly}" = "y" ]; then
+    roflag=-r
+  else
+    roflag=-w
+  fi
+
+  # FIXME This has no error checking
+  modprobe ${fstype}
+
+  # FIXME This has no error checking
+  # Mount root
+  mount ${roflag} -t ${fstype} ${clp_rootflags} ${path} ${rootmnt}
 fi
-
-# We've given up, but we'll let the user fix matters if they can
-while [ ! -e "${path}" ]; do
-  echo "ALERT!  ${path} does not exist.  Dropping to a shell!"
-  echo "  Check your root= boot argument (cat /proc/cmdline)"
-  panic " Check for missing modules (cat /proc/modules), or device files (ls /dev)"
-done
-
-# Get the root filesystem type if not set
-if [ -z "${clp_rootfstype}" ]; then
-  fstype=$(get_fstype "${path}")
-else
-  fstype=${clp_rootfstype}
-fi
-
-if [ "${clp_readonly}" = "y" ]; then
-  roflag=-r
-else
-  roflag=-w
-fi
-
-# FIXME This has no error checking
-modprobe ${fstype}
-
-# FIXME This has no error checking
-# Mount root
-mount ${roflag} -t ${fstype} ${clp_rootflags} ${path} ${rootmnt}
 """)
         return MountRoot()
 
