@@ -56,7 +56,10 @@ USB, ... disks connected locally to the computer.
 .P
 .B iscsi
 - for booting the computer via a network device from a remote iSCSI
-target. 
+target.
+.P
+.B nfs
+- for booting from NFS root disks.
 .SH "BOOT VARIANTS"
 A
 .B boot variant
@@ -148,6 +151,18 @@ Example:
 rfs=iscsi:localiqn=iqn.2008-02.org.flonatel:00031;\\
 .br
 portals=192.168.228.20,192.168.228.21;path=/dev/mapper/iboot-root1
+.SH BOOT TYPE 'nfs'
+The nfs handles only the following additional parameters:
+.P
+.B path
+- The path to the NFS root.  This typically has the form
+ip-address:path - where ip-address is the IP address of the
+NFS host and path is the path to the NFS exported root file system.
+.P
+.B readonly
+- Possible values: true, false.
+Whether the NFS root should be mounted read only or not. By default
+if this is not specified - false is assumed.
 .SH BOOT VARIANT 'network'
 Currently only dhcp configuration of network devices is possible.  The
 network devices are specified with 
@@ -192,6 +207,10 @@ When using lvm2 volumes, this boot variant must be added.
 .SH BOOT VARIANT 'md'
 When using (software) RAID with Linux md, this boot variant must be
 added.
+.SH "PARAMETER SPECIFICATION"
+Some variables expect a boolean parameter. The following strings are
+evaluated to true: 'y' 'yes' 'true' 'on' '1'.  All other values are
+evaluated to false.
 .SH "SEE ALSO"
 .B init4boot(7)
 - Overview over the different aspects of the init4boot package.
