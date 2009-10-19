@@ -23,7 +23,7 @@ class nw_dhcp:
      dhcp)
        # Interface must be enabled (if not this results in: network down)
        ifconfig ${device} up
-       udhcpc -i ${device} -q -t 120 -T 1
+       udhcpc -O staticroutes -i ${device} -q -t 120 -T 1
        ;;
 """)
         return SetupLowLevelTransport()
@@ -52,6 +52,29 @@ class nw_dhcp:
 #               edited by Andreas Florath to adapt for init4boot
 
 [ -z "$1" ] && echo "Error: should be called from udhcpc" && exit 1
+
+#date >>/tmp/nw_dhcp.log
+#env >>/tmp/nw_dhcp.log
+#echo "-------" >>/tmp/nw_dhcp.log
+
+log()
+{
+  [ "${verbose}" = "0" ] && return
+  d=`date +"[%Y-%m-%d %H:%M:%S %Z]"`
+  echo ${d} init4boot "$@"
+}
+
+set_static_routes()
+{
+    while [ $# -ne 0 ]; do
+	network=$1
+	shift
+	gateway=$1
+	shift
+        log "Adding route to '$network' via '$gateway'"
+	ip route add to $network via $gateway
+    done
+}
 
 RESOLV_CONF="/etc/resolv.conf"
 [ -n "$broadcast" ] && BROADCAST="broadcast $broadcast"
@@ -83,6 +106,8 @@ case "$1" in
                         echo adding dns $i
                         echo nameserver $i >> $RESOLV_CONF
                 done
+
+                [ -n "$staticroutes" ] && set_static_routes $staticroutes
                 ;;
 esac
 

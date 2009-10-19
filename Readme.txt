@@ -18,6 +18,13 @@ The NFS root feature is currently experimental.
 
 ===========================================================================
 
+Starting with version 0.5 init4boot supports classless routing.  This
+feature is based on busybox's udhcpc implementation.  Because this
+feature is quite new busybox version 1.15.2 is needed.  (So, e.g. for
+Debian Lenny you need to grab the sources and compile it yourself.)
+
+===========================================================================
+
 Short HowTo
 -----------
 

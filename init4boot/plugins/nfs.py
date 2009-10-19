@@ -6,6 +6,8 @@
 # For licencing details see COPYING
 #
 
+import os
+
 class nfs:
 
     def __init__(self, config, opts):
