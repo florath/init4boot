@@ -267,6 +267,59 @@ changed.  E. g. it is possible to use read-only nfs disks.
 Some variables expect a boolean parameter. The following strings are
 evaluated to true: 'y' 'yes' 'true' 'on' '1'.  All other values are
 evaluated to false.
+.SH "Examples"
+.P Installation with FAI
+The following command starts up a KVM virtual machine and installs the
+system using FAI. Of course some parmaters must be adapted to reflect
+local environment.
+ kvm -enable-kvm -cpu qemu64 -smp 2 -m 1024 -k de \\
+.br
+ -name iscsiboot -vnc ":59" \\
+.br
+ -net nic,model=virtio,vlan=1,macaddr=00:11:32:13:01:ab \\
+.br
+ -net tap,vlan=1,ifname=tap0,script=no \\
+.br
+ -kernel /boot/vmlinuz-2.6.31-17-server \\
+.br
+ -initrd i4b-initrd.img-2.6.31-17-server \\
+.br
+ -append "bv=udev,lvm2,md,aufs loadmods=virtio_pci,virtio_net \\
+.br
+   nw=eth0:dhcp \\
+.br
+   rfs=nfs:path=192.168.77.35:/srv/fai/nfsroot/live/filesystem.dir \\
+.br
+   FAI_FLAGS=verbose,sshd,createvt FAI_ACTION=install \\
+.br
+   FAI_PORTALS=192.168.77.42,192.168.77.43"
+.P
+The following command then starts up the virtual machine, which was
+installed using FAI:
+ kvm -enable-kvm -cpu qemu64 -smp 2 -m 1024 -k de -vnc ":59" \\
+.br
+ -name iscsiboot\\
+.br
+ -net nic,model=virtio,vlan=1,macaddr=00:11:32:13:01:ab \\
+.br
+ -net tap,vlan=1,ifname=tap0,script=no \\
+.br
+ -kernel /boot/vmlinuz-2.6.31-17-server \\
+.br
+ -initrd i4b-initrd.img-2.6.31-17-server \\
+.br
+ -append "bv=udev,lvm2,md loadmods=virtio_pci,virtio_net nw=eth0:dhcp \\
+.br
+   rfs=iscsi:localiqn=iqn.2008-02.org.flonatel:00031;\\
+.br
+   portals=192.168.77.42,192.168.77.43;\\
+.br
+   path=/dev/iscsiboot/root;\\
+.br
+   usechap=true;un_out=c_u_i;pw_out=c_p_i;un_in=c_u_o;pw_in=c_p_o;\\
+.br
+   disc_un_out=user;disc_pw_out=password"
+.P
 .SH "SEE ALSO"
 .B init4boot(7)
 - Overview over the different aspects of the init4boot package.
