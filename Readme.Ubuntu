@@ -1,0 +1,11 @@
+
+Readme for Debian
+=================
+
+Before running the i4b-mkinitramfs script from source tar ball or to
+create the debian package, install the following packages (as of
+Ubuntu 9.10): 
+
+binutils multipath-tools open-iscsi debhelper lvm2 mdadm
+
+busybox-static
