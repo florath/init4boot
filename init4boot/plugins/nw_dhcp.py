@@ -1,7 +1,7 @@
 #
 # init4boot nw_dhcp plugin
 #
-# (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2008,2010 by flonatel (sf@flonatel.org)
 #
 # For licensing details see COPYING
 #
@@ -108,6 +108,7 @@ case "$1" in
                 done
 
                 [ -n "$staticroutes" ] && set_static_routes $staticroutes
+                [ -n "${hostname}" ] && hostname ${hostname}
                 ;;
 esac
 
