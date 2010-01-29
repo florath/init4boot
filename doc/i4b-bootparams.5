@@ -18,7 +18,7 @@
 .\"
 .\" (c) 2008-2010 by flonatel (sf@flonatel.org)
 .\"
-.TH i4b-bootparams 5 2009-10-07 "Linux" "Linux booting"
+.TH i4b-bootparams 5 2010-01-29 "Linux" "Linux booting"
 .SH NAME
 i4b-bootparams \- boot up parameter handling
 .SH DESCRIPTION
@@ -147,10 +147,53 @@ all automatically tagged available iSCSI targets are used.
 .B path
 - The path to the root device.
 .P
-Example:
+.B usechap
+- Can be 'true' or 'false'.  If set to 'true' CHAP is used for disk
+access.  (Note that this has no influence to used the discovery
+protocol - the discovery can is separatly handled.)
+.P
+.B un_out 
+and
+.B pw_out
+- Specifies the outgoing username and password (client i.e. initiator
+perspective). Note that username and password must either both or
+none be specified.
+.P
+.B un_in
+and
+.B pw_in
+- Specifies the incoming username and password (client i.e. initiator
+perspective). Note that username and password must either both or
+none be specified.
+.P
+.B disc_un_out 
+and
+.B disc_pw_out
+- Specifies the outgoing username and password for discovering disks
+(client i.e. initiator perspective). Note that username and password
+must either both or none be specified.  
+.P
+Note about usernames and passwords:
+.br
+Note that because of a current limitation of the open-iscsi
+implementation that the given usernames and passwords are used for all
+targets. Also it is currently not possible to specify discovery in
+passwords, because the open-iscsi has some problems with this.
+.P
+Examples:
+.P
 rfs=iscsi:localiqn=iqn.2008-02.org.flonatel:00031;\\
 .br
 portals=192.168.228.20,192.168.228.21;path=/dev/mapper/iboot-root1
+.P
+rfs=iscsi:localiqn=iqn.2008-02.org.flonatel:00031;\\
+.br
+portals=192.168.228.20,192.168.228.21;path=/dev/mapper/iboot-root1;\\
+.br
+usechap=true;un_out=uout;pw_out=secretout;un_in=uin;pw_in=secretin;\\
+.br
+disc_un_out=disc_user;disc_pw_out=discpassword
+.P
 .SH BOOT TYPE 'nfs'
 The nfs handles only the following additional parameters:
 .P
