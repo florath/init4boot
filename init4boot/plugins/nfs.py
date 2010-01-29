@@ -57,6 +57,8 @@ fi
                 ofile.write("""
 if [ "${boot_type}" = "nfs" ]; then
   logp "Mounting NFS root"
+  maybe_break nfs_mount
+  log "Mounting with 'nfsmount -o nolock ${nfs_roflag} ${path} ${rootmnt}'"
   nfsmount -o nolock ${nfs_roflag} ${path} ${rootmnt}
 fi
 """)
