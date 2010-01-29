@@ -40,16 +40,22 @@ fi
                 ofile.write("""
 if check_bv "udev"; then
   logp "Prepare root dir udev setup"
+  maybe_break udev_prepare_root
   # Stop udevd, we'll miss a few events while we run init, but we catch up
   for proc in /proc/[0-9]*; do
     [ -x $proc/exe ] || continue
-    [ "$(readlink $proc/exe)" != /sbin/udevd ] || kill ${proc#/proc/}
+    [ "$(readlink $proc/exe)" != /sbin/udevd ] || kill ${proc#/proc/} 
+    # In Ubuntu it's /bin
+    [ "$(readlink $proc/exe)" != /bin/udevd ] || kill ${proc#/proc/}
   done
+  log "Killed old udevd"
 
   # move the /dev tmpfs to the rootfs
-  mount -n -o move /dev $rootmnt/dev
+  log "Move /dev to ${rootmnt}/dev"
+  mount -n -o move /dev ${rootmnt}/dev
 
   # create a temporary symlink to the final /dev for other initramfs scripts
+  log "Create symlink to new dev"
   nuke /dev
   ln -s $rootmnt/dev /dev
   logpe
