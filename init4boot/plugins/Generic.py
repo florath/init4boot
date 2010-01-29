@@ -1,7 +1,7 @@
 #
 # This is the generic part - also implemented as a plugin
 #
-# (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2008-2010 by flonatel (sf@flonatel.org)
 #
 # For licensing details see COPYING
 #
@@ -83,35 +83,34 @@ panic()
 # Return value: indicates if an fs could be recognized
 get_fstype ()
 {
-  local fs fstype fssize ret
-  fs="${1}"
-  FSTYPE=$(/lib/udev/vol_id -t "${fs}" 2> /dev/null)
-  ret=$?
+  local FS FSTYPE FSSIZE RET
+  FS="${1}"
+  eval $(fstype "${FS}" 2> /dev/null)
 
   if [ -z "${FSTYPE}" ]; then
     FSTYPE="unknown"
   fi
   echo "${FSTYPE}"
-  return ${ret}
+  return ${RET}
 }
 maybe_break()
 {
-        if [ "${break}" = "$1" ]; then
-                panic "Spawning shell within the initramfs (Phase ${break})"
-        fi
+  if [ "${break}" = "$1" ]; then
+    panic "Spawning shell within the initramfs (Phase ${break})"
+  fi
 }
 check_bv()
 {
-    for m in ${clp_bv}; do
-	[ "${m}" = "${1}" ] && return 0
-    done
-    return 1
+  for m in ${clp_bv}; do
+    [ "${m}" = "${1}" ] && return 0
+  done
+  return 1
 }
 nuke()
 {
-    d=$1
-    find $d ! -type d 2>/dev/null | xargs rm -fr -- 
-    find $d 2>/dev/null | xargs rm -fr -- 
+  d=$1
+  find $d ! -type d 2>/dev/null | xargs rm -fr -- 
+  find $d 2>/dev/null | xargs rm -fr -- 
 }
 
 # Global variables
@@ -147,6 +146,9 @@ for x in $(cat /proc/cmdline); do
     init=*)
            clp_init=${x#init=}
            ;;
+    loadmods=*)
+	   clp_loadmods=${x#loadmods=}
+	   ;;
     nw=*)
            clp_nw=${x#nw=}
            ;;
@@ -252,6 +254,11 @@ maybe_break HandleInitialModuleSetup
             def pre_output(self, ofile):
                 ofile.write("""
 depmod -a
+for mod in `echo ${clp_loadmods} | tr "," " "`;
+do
+    log "Pre-loading module '${mod}'"
+    modprobe $mod
+done
 """)
                 
         return HandleInitialModuleSetup()
@@ -311,8 +318,8 @@ if [ ${clp_use_std_mount} = "1" ]; then
     roflag=-w
   fi
 
-  # FIXME This has no error checking
-  modprobe ${fstype}
+  # FIXME This has no error checking (Might be even compiled in kernel)
+  modprobe ${fstype} >/dev/null 2>&1
 
   # FIXME This has no error checking
   # Mount root
@@ -327,8 +334,11 @@ fi
             def pre_output(self, ofile):
                 ofile.write("""
 # Move virtual filesystems over to the real filesystem
+log "Move-Mount /sys"
 mount -n -o move /sys ${rootmnt}/sys
+log "Move-Mount /proc"
 mount -n -o move /proc ${rootmnt}/proc
+log "Move-Mount finished"
 
 # Check init bootarg
 if [ -n "${init}" ] && [ ! -x "${rootmnt}${init}" ]; then
@@ -365,7 +375,8 @@ fi
 
 # Chain to real filesystem
 maybe_break run_init
-exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
+log "Running run-init"
+exec run-init ${rootmnt} ${init} -v "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
 panic "Could not execute run-init."
 """)
 
@@ -485,9 +496,16 @@ panic "Could not execute run-init."
                 if os.path.exists("/tmp/run-init"):
                     c.copy_exec("/tmp/run-init")
 
-                # For Debian
+                # For Debian / Ubuntu
+                copy_klibc = False
                 if os.path.exists("/usr/lib/klibc/bin/run-init"):
                     c.copy_exec("/usr/lib/klibc/bin/run-init")
+                    copy_klibc = True
+                if os.path.exists("/usr/lib/klibc/bin/fstype"):
+                    c.copy_exec("/usr/lib/klibc/bin/fstype")
+                    copy_klibc = True
+
+                if copy_klibc:
                     # Have a look for the full pathname of the klibc
                     # (which changes from release to release and from
                     # architecture to architecture).

@@ -125,6 +125,15 @@ parameter should hold these unique id.  The use of this value is
 described in the boot type of variante where it's used.
 .P
 Example: hostid=iboot
+.SS MODULE LOADING
+In some rare cases it can be, that additional modules are not
+automatically loaded and must be explicitly loaded.  All modules given
+with the parameter
+.B loadmods=
+will be explicitly loaded mostly initally during the boot process.
+.P
+Example: loadmods=virtio_pci,virtio_net
+.P
 .SH BOOT TYPE 'local'
 The local boot type only handles one additional parameter:
 .P
