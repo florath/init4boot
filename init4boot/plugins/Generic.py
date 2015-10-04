@@ -2,6 +2,7 @@
 # This is the generic part - also implemented as a plugin
 #
 # (c) 2008-2010 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licensing details see COPYING
 #
@@ -11,11 +12,17 @@ import os
 import shutil
 import re
 
-class Generic:
+from init4boot.lib.BaseLogger import BaseLogger
 
+class Generic(BaseLogger):
     def __init__(self, config, opts):
+        BaseLogger.__init__(self, "Generic")
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
+
+    def check(self):
+        return True
 
     def go_Intro(self):
 
@@ -78,6 +85,7 @@ panic()
   [ -n "${1}" ] && echo "PANIC: ${1}"
   PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
+panic
 # Parameter: device node to check
 # Echos fstype to stdout
 # Return value: indicates if an fs could be recognized
@@ -181,7 +189,7 @@ done
             def pre_output(self, ofile):
                 ofile.write("""
 [ "${clp_verbose}" = "1" ] && verbose = 1
-[ "${clp_debug}" = "1" ] && exec >/tmp/initramfs.debug 2>&1 && set -x
+[ "${clp_debug}" = "1" ] && exec >/initramfs.debug 2>&1 && set -x
 [ -n "${clp_break}" ] && break=${clp_break}
 """)
         return CommandLineVerbose()
@@ -388,13 +396,14 @@ panic "Could not execute run-init."
 
     def mi_Copy(self):
 
-        class Copy:
+        class Copy(BaseLogger):
 
             def __init__(self, opts):
+                BaseLogger.__init__(self, "Copy")
                 self.opts = opts
                 
             def create_sysdirs(self, c):
-                c.log("Creating subdirs")
+                self.log_info("Creating subdirs")
                 # Note: the lib/modules and lib/firmware is automatically
                 #       generated when copying these.
                 for d in ["bin", "etc"]:
@@ -403,10 +412,10 @@ panic "Could not execute run-init."
                         os.makedirs(dname)
 
             def copy_modules(self, c):
-                c.log("Copy modules")
+                self.log_info("Copy modules")
                 shutil.copytree(os.path.join(c.opts.root_dir, "lib/modules"),
                                 os.path.join(c.tmpdir, "lib/modules"), True)
-                c.log("Copy firmware")
+                self.log_info("Copy firmware")
                 shutil.copytree(os.path.join(c.opts.root_dir, "lib/firmware"),
                                 os.path.join(c.tmpdir, "lib/firmware"), True)
 
@@ -420,7 +429,7 @@ panic "Could not execute run-init."
                         self.remove_file(name, fullpath)
 
             def remove_modules(self, c, bname):
-                c.log("Remove some modules")
+                self.log_info("Remove some modules")
                 self.remove_file(bname + ".ko", os.path.join(c.tmpdir,
                                                              "lib/modules")) 
 
@@ -449,7 +458,7 @@ panic "Could not execute run-init."
                     os.symlink("/bin/busybox", dest)
 
             def copy_busybox(self, c):
-                c.log("Copy busybox")
+                self.log_info("Copy busybox")
                 c.copy_exec_w_path("busybox", ["bin", "sbin"])
                 dest = os.path.join(c.tmpdir, "bin/sh")
                 destdir = os.path.dirname(dest)
@@ -459,10 +468,12 @@ panic "Could not execute run-init."
                 self.make_busybox_links(c)
 
             def get_klibc_name(self):
-                files = os.listdir("/lib")
+                self.log_debug("get_klibc_name [%s]" % self.opts.root_dir)
+                files = os.listdir(os.path.join(self.opts.root_dir, "lib"))
                 for f in files:
                     if f.startswith("klibc-"):
-                        return "/lib/" + f
+                        self.log_debug("Found klibc [%s]" % f)
+                        return os.path.join(self.opts.root_dir, "lib/" + f)
                 return None
         
             def output(self, c):
@@ -482,7 +493,7 @@ panic "Could not execute run-init."
                 self.copy_busybox(c)
                 c.copy_exec("/bin/sleep")
 
-                c.log("Copy modutils")
+                self.log_info("Copy modutils")
                 c.copy_exec("/sbin/modprobe")
                 c.copy_exec("/sbin/depmod")
                 c.copy_exec("/sbin/rmmod")
@@ -522,13 +533,14 @@ panic "Could not execute run-init."
     
     def mi_Create(self):
 
-        class Create:
+        class Create(BaseLogger):
 
             def __init__(self, opts):
+                BaseLogger.__init__(self, "Generic-Create")
                 self.opts = opts
 
             def output(self, c):
-                c.log("Creating cpio archive")
+                self.log_info("Creating cpio archive")
                 os.system("P=$PWD && cd %s &&  find . | " \
                           "cpio --quiet -o -H newc | gzip >$P/%s"
                           % (c.tmpdir, self.opts.output_file))

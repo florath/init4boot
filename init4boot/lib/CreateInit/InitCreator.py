@@ -20,7 +20,7 @@ class InitCreator:
         dc.collect()
 
         phaseclass = CIPhases()
-        plugins = Plugins(phaseclass, self.opts.plugins_dir,
+        plugins = Plugins("InitCreator", phaseclass, self.opts.plugins_dir,
                           self.config, self.opts)
         plugins.load()
 

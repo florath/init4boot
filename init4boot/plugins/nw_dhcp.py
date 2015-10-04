@@ -2,18 +2,23 @@
 # init4boot nw_dhcp plugin
 #
 # (c) 2008,2010 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licensing details see COPYING
 #
 
 import os
 
-class nw_dhcp:
+class nw_dhcp(object):
 
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
 
+    def check(self):
+        return True
+        
     def go_SetupLowLevelTransport(self):
 
         class SetupLowLevelTransport:

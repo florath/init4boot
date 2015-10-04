@@ -4,6 +4,7 @@
 # Handle loading of plugins
 #
 # (c) 2008 by flonatel
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licensing details see COPYING
 #

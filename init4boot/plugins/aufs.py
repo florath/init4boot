@@ -2,15 +2,23 @@
 # init4boot aufs plugin
 #
 # (c) 2010 by flonatel
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licencing details see COPYING
 #
 
-class aufs:
+from init4boot.lib.FilesystemUtils import fsutils
+
+class aufs(object):
 
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
+
+    def check(self):
+        return fsutils.must_exist(self.__root_dir,
+                                  ["usr/sbin", "sbin"], "mount.aufs") 
 
     def go_SetupDiskDevices(self):
 

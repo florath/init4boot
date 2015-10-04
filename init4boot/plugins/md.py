@@ -2,18 +2,23 @@
 # init4boot md plugin
 #
 # (c) 2009 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licensing details see COPYING
 #
 
 import os
 
-class md:
+from init4boot.lib.FilesystemUtils import fsutils
 
+class md(object):
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
-
+        self.__root_dir = opts.root_dir
+        
+    def check(self):
+        return fsutils.must_exist(self.__root_dir, ["sbin"], "mdadm")
 
     def go_SetupHighLevelTransport(self):
 

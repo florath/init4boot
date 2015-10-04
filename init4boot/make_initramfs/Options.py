@@ -6,7 +6,7 @@
 import sys
 from optparse import OptionParser
 
-class Options:
+class Options(object):
 
     def __init__(self):
         parser = OptionParser()
@@ -35,4 +35,4 @@ class Options:
             
         if self.options.plugins_dir == None:
             self.options.plugins_dir = "/usr/share/pyshared"
-            
+

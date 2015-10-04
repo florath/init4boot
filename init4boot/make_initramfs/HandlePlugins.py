@@ -14,10 +14,12 @@ from init4boot.lib.ldd import ldd
 
 from init4boot.lib.Plugins import Plugins
 from init4boot.lib.MakeInitramfs.MIPhases import MIPhases
+from init4boot.lib.BaseLogger import BaseLogger
 
-class HandlePlugins:
+class HandlePlugins(BaseLogger):
 
     def __init__(self, opts):
+        BaseLogger.__init__(self, "HandlePlugins")
         self.opts = opts
         # Create the directory where everything goes:
         self.tmpdir = tempfile.mkdtemp(prefix = "make_initramfs-")
@@ -26,13 +28,19 @@ class HandlePlugins:
         self.root_libs.append(os.path.join(self.opts.root_dir, "usr/lib"))
         self.root_libs.append(os.path.join(self.opts.root_dir, "lib"))
 
+        # Read in all the plugins
+        self.__phaseclass = MIPhases()
+        self.__plugins = Plugins("HandlePlugins",
+                                 self.__phaseclass, self.opts.plugins_dir,
+                                 None, self.opts)
+
     def __del__(self):
         # Removing temporary dir
         self.remove_tmp_dir()
 #        print "rm -fr %s" % self.tmpdir
 
     def log(self, m):
-        print "*** " + m
+        self.log_info("FIX LOG MSG! [%s]" % m)
 
     # There is no recursive rm by default in python
     def remove_tmp_dir(self):
@@ -120,32 +128,66 @@ class HandlePlugins:
                 print "Can't copy %s to %s: %s" % \
                       (`srcname`, `dstname`, str(why))    
 
-    # Source is in root_dir, dest in tmp dir
+    def get_realpath_in_chroot(self, filename):
+        tsource = filename
+        while os.path.islink(tsource):
+            res = os.readlink(tsource)
+            tsource_orig = tsource
+            self.log_error("RRRR %s %s" % (tsource, res))
+            if res[0] == "/":
+                res = res[1:]
+                tsource = os.path.join(self.opts.root_dir, res)
+            else:
+                tsource = os.path.join(os.path.dirname(tsource), res)
+            self.log_debug("copy_exec follow link [%s] -> [%s]"
+                           % (tsource_orig, tsource))
+        return tsource
+               
     def copy_exec(self, source_file, ddir="bin"):
+        """Source is in root_dir, dest in tmp dir"""
+        self.log_debug("copy_exec [%s] -> [%s]" % (source_file, ddir))
         destdir = os.path.join(self.tmpdir, ddir)
         if not os.path.exists(destdir):
             os.makedirs(destdir)
         if source_file[0] == "/":
             source_file = source_file[1:]
         source = os.path.join(self.opts.root_dir, source_file)
-        shutil.copy2(source, destdir)
+        self.log_debug("copy_exec internal [%s] -> [%s]" % (source, destdir))
+
+        # ToDo: Handling link can also be done in the initram to
+        #       safe some memory
+        # Check for links!
+        real_source = self.get_realpath_in_chroot(source)
+        
+        self.log_debug("copy_exec copy [%s] -> [%s]"
+                       % (real_source, os.path.join(destdir,
+                                                    os.path.basename(source))))
+        shutil.copy2(real_source,
+                     os.path.join(destdir, os.path.basename(source)))
         # Get the shared libraries for this
         shared_libs = ldd(source, self.root_libs)
-        print "copy_exec %s (shared libs: %s)" % (source, shared_libs)
         for lib in shared_libs:
+            self.log_debug("Checking for lib [%s]" % lib)
             if not lib.startswith(self.opts.root_dir):
                 # Oops: got a lib outside the root
-                print "Library '%s' outside the root - Check the links in the root" % lib
+                print("Library [%s] outside the root" % lib)
                 sys.exit(1)
             rawdlib = lib[len(self.opts.root_dir):]
             if rawdlib[0]=="/":
                 rawdlib = rawdlib[1:]
+            self.log_debug("Normalized lib path [%s]" % rawdlib)
+                
             destlib = os.path.join(self.tmpdir, rawdlib)
 
             destdir = os.path.dirname(destlib)
             if not os.path.exists(destdir):
                 os.makedirs(destdir)
-            shutil.copy2(lib, destlib)
+
+            real_lib = self.get_realpath_in_chroot(lib)
+                
+            self.log_debug("copy_exec copy_lib [%s] -> [%s]"
+                           % (real_lib, destlib))
+            shutil.copy2(real_lib, destlib)
 
     # Copy all executables from one dir - specified by a regexp - to
     # another dir
@@ -159,21 +201,20 @@ class HandlePlugins:
                 self.copy_exec(os.path.join(source_dir, d), dest_dir)
 
     def copy_exec_w_path(self, source_file, path):
+        self.log_debug("copy_exec_w_path: source [%s] path [%s]"
+                       % (source_file, path))
         if source_file[0] == "/":
             source_file = source_file[1:]
         for p in path:
             spath = os.path.join(self.opts.root_dir, p, source_file)
             if os.path.exists(spath):
-                self.copy_exec(spath)
+                self.copy_exec(os.path.join(p, source_file))
                 return
-        print "*** File '%s' not found in '%s'" % (source_file, path)
+        self.log_error("File '%s' not found in '%s'" % (source_file, path))
 
     def create_initramfs(self):
-        # Read in all the plugins
-        phaseclass = MIPhases()
-
-        plugins = Plugins(phaseclass, self.opts.plugins_dir, None, self.opts)
-        plugins.load()
+        self.log_debug("create_initramfs called")
+        self.__plugins.load()
         # All plugins are loaded now, so execute them
-        plugins.execute(self)
+        self.__plugins.execute(self)
         

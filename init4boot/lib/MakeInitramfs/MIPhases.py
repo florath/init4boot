@@ -1,5 +1,6 @@
 #
 # (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.net)
 #
 # For licensing details see COPYING
 #
@@ -10,6 +11,10 @@ class MIPhases:
         stage_cnt = 0
         self.desc = {}
 
+        self.Check = stage_cnt
+        self.desc[self.Check] = ("Check", "Check if this can be enabled")
+
+        stage_cnt+=1
         self.Init = stage_cnt
         self.desc[self.Init] = ("Init", "Initializes the copying")
 

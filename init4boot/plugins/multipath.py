@@ -2,17 +2,24 @@
 # multipath iSCSI plugin
 #
 # (c) 2008-2009 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licensing details see COPYING
 #
 
 import os
 
-class multipath:
-    
+from init4boot.lib.FilesystemUtils import fsutils
+
+class multipath(object):
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
+
+    def check(self):
+        return fsutils.must_exist(self.__root_dir, ["sbin"], "multipath") \
+            and fsutils.must_exist(self.__root_dir, ["sbin"], "kpartx")
 
     def go_SetupHighLevelTransport(self):
 

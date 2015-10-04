@@ -2,17 +2,27 @@
 # init4boot iSCSI plugin
 #
 # (c) 2008,2010 by flonatel
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licencing details see COPYING
 #
 
 import os
 
-class iSCSI:
+from init4boot.lib.FilesystemUtils import fsutils
+
+class iSCSI(object):
 
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
+
+    def check(self):
+        return fsutils.must_exist(self.__root_dir,
+                                  ["usr/sbin", "sbin"], "iscsid") \
+            and fsutils.must_exist(self.__root_dir,
+                                   ["usr/sbin", "sbin", "usr/bin"], "iscsiadm")
 
     def go_CommandLineEvaluation(self):
 

@@ -7,17 +7,24 @@
 # username and / or passwords.
 #
 # (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licencing details see COPYING
 #
 
 import os
 
+from init4boot.lib.FilesystemUtils import fsutils
+
 class tftp:
 
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
+
+    def check(self):
+        return True
 
     def go_CommandLineParsing(self):
 

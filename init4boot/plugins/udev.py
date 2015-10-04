@@ -2,6 +2,7 @@
 # init4boot udev plugin
 #
 # (c) 2008 by flonatel (sf@flonatel.org)
+# (c) 2015 by Andreas Florath (andreas@florath.org)
 #
 # For licensing details see COPYING
 #
@@ -9,11 +10,14 @@
 import os
 
 class udev:
-
     def __init__(self, config, opts):
         self.config = config
         self.opts = opts
+        self.__root_dir = opts.root_dir
 
+    def check(self):
+        return True
+    
     def go_HandleInitialModuleSetup(self):
 
         class HandleInitialModuleSetup:
@@ -24,6 +28,7 @@ if check_bv "udev"; then
   logp "Handling udev"
   echo > /sys/kernel/uevent_helper
   mkdir -p /dev/.udev/db/
+  mkdir -p /run/udev
   udevd --daemon
   mkdir -p /dev/.udev/queue/ /dev/.udev/rules.d/
   udevadm trigger
