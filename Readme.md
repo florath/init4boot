@@ -10,9 +10,9 @@ some problems with this.
 # HowTo
 To create an initramfs, call the 'i4b-mkinitramfs' with the options:
 
--o <initramfs>: the output file name
--r <rootdir>: the root directory from which to take modules, libs and
-              binaries.
+* -o <initramfs>: the output file name
+* -r <rootdir>: the root directory from which to take modules, libs and
+  binaries.
 
 The rootdir can be an installation done with 'debootstrap' or a copy
 of some existing system.  When using a copy of the existing system, the
