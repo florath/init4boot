@@ -105,13 +105,7 @@ fi
                 # (Part of kpartx package which is only available in unstable)
                 #                c.copy("lib/udev/dmsetup_env", "lib/udev")
 
-                c.copy_exec("sbin/mpath_prio_alua")
-                c.copy_exec_w_path("mpath_prio_balance_units", ["sbin", ])
-                c.copy_exec("sbin/mpath_prio_emc")
-                c.copy_exec("sbin/mpath_prio_hds_modular")
-                c.copy_exec("sbin/mpath_prio_hp_sw")
-                c.copy_exec_w_path("mpath_prio_netapp", ["sbin", ])
-                c.copy_exec_w_path("mpath_prio_random", ["sbin", ])
-                c.copy_exec("sbin/mpath_prio_rdac")
+                # Copy all the dependend multipath so libs
+                c.copytree("lib/multipath", "lib/multipath")
 
         return Copy()
