@@ -7,6 +7,23 @@ different system.  It was desined with debootstrap in mind:
 alternative implementations like initramfs-tools do - at least - have
 some problems with this.
 
+# Features & Differences to other implementations
+There are some features which make init4boot unique.  Other
+implementations handle this in a different way.
+
+## Features
+* *There is only one initrd.*  One init4boot initrd can be used to boot
+  **all**.  There is no need for creating new initrds for each system.
+* *Full debootstrap support.*  init4boot does not make any assumptions
+  about the host or target system.
+* *Complete control.*  No assumptions, no heuristics what is or can in
+  the host / target system.  Everything can be specified on the
+  command line or via an tftp server.
+
+## Drawbacks
+* Because everything is in 'the' initrd, it's big.  Booting takes
+  longer. 
+
 # HowTo
 To create an initramfs, call the 'i4b-mkinitramfs' with the options:
 
@@ -25,7 +42,7 @@ world, e. g. lib -> /lib64.  In this case the wrong files (from the
 build host) will be used.
 
 # Thanks
-Some parts of the shell script are taken from the initramfs-tools
-implementation that can be found at
+Some ideas and parts of the shell scripts are taken from the
+initramfs-tools.  This implementation that can be found at
 http://anonscm.debian.org/cgit/kernel/initramfs-tools.git
 
