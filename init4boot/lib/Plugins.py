@@ -47,8 +47,9 @@ class Plugins(BaseLogger):
 
             check = eval("o.check()")
             if check == False:
-                self.log_warn("Disable module [%s]" % modulename)
-                continue
+                self.log_warn("Preconditions for module [%s] no available"
+                              % modulename)
+                sys.exit(1)
             
             for stage in xrange(0, self.phaseclass.TheEnd):
                 fname = "%s%s" % (self.phaseclass.function_base,
