@@ -41,6 +41,10 @@ Note: It is very important, that there must no link to the outer
 world, e. g. lib -> /lib64.  In this case the wrong files (from the
 build host) will be used.
 
+# Known to Run
+This is a list of all systems where init4boot is known to work:
+* Debian Jessie armhl on Raspberry Pi 2 with u-boot
+
 # Thanks
 Some ideas and parts of the shell scripts are taken from the
 initramfs-tools.  This implementation that can be found at
