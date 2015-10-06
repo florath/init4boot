@@ -31,8 +31,13 @@ if check_bv "udev"; then
   mkdir -p /run/udev
   udevd --daemon
   mkdir -p /dev/.udev/queue/ /dev/.udev/rules.d/
-  udevadm trigger
+  udevadm trigger --action=add
   udevadm settle || true
+  # Looks that the mmcblk devices are not (correctly) handled
+  # I'm not sure if this is a general thing or specific for Raspberry Pi...
+  ##mknod /dev/mmcblk0 b 179 0
+  ##mknod /dev/mmcblk0p1 b 179 1
+  ##mknod /dev/mmcblk0p2 b 179 2
   logpe
 fi
 """)
@@ -90,6 +95,8 @@ fi
                 # From udev only
                 c.log("Copy udef config files from etc")
                 c.copytree("etc/udev", "etc/udev")
+                c.log("Copy udef config files from lib")
+                c.copytree("lib/udev", "lib/udev")
                 # XXX Not existsing : c.copy("etc/scsi_id.config", "etc")
                 # WHY: rm -f $DESTDIR/etc/udev/rules.d/*_cd-aliases-generator.rules
                 c.log("Copy used binaries")

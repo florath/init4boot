@@ -29,12 +29,23 @@ class nfs(object):
             def output(self, ofile):
                 ofile.write("""
   nfs:*)
-    boot_type="nfs"
-    boot_args=${clp_rfs#nfs:}
-    bv_deps="${bv_deps} network"
+    bv_deps="${bv_deps} network nfs"
     ;;
 """)
         return CommandLineEvaluation()
+
+    def go_HandleInitialModuleSetup(self):
+
+        class HandleInitialModuleSetup:
+
+            def output(self, ofile):
+                ofile.write("""
+if check_bv "nfs"; then
+  logp "Handling NFS"
+  modprobe -q nfs
+fi
+""")
+        return HandleInitialModuleSetup()
 
     def go_SetupHighLevelTransport(self):
 
@@ -42,9 +53,8 @@ class nfs(object):
 
             def output(self, ofile):
                 ofile.write("""
-if [ "${boot_type}" = "nfs" ]; then
+nfs:*)
   logp "Setting up NFS"
-  modprobe -q nfs
   readonly="false"
   eval ${boot_args}
   clp_readonly=`istrue ${readonly}`
@@ -53,7 +63,7 @@ if [ "${boot_type}" = "nfs" ]; then
   [ ${clp_readonly} = "1" ] && nfs_roflag="-o ro"
   clp_use_std_mount="0"
   logpe
-fi
+;;
 """)
         return SetupHighLevelTransport()
 

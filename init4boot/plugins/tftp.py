@@ -42,12 +42,11 @@ class tftp:
     def go_CommandLineEvaluation(self):
 
         class CommandLineEvaluation:
-            def cleanup(self, ofile):
+            def output(self, ofile):
                 ofile.write("""
-if check_bv "tftp"; then
-  log "Network boot variant is needed for tftp"
-  bv_deps="${bv_deps} network"
-fi
+  tftp:*)
+    bv_deps="${bv_deps} network tftp"
+    ;;
 """)
         return CommandLineEvaluation()
 

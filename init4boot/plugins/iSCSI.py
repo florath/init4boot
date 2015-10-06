@@ -31,13 +31,25 @@ class iSCSI(object):
             def output(self, ofile):
                 ofile.write("""
   iscsi:*)
-    boot_type="iscsi"
-    boot_args=${clp_rfs#iscsi:}
-    bv_deps="${bv_deps} network"
+    bv_deps="${bv_deps} network iscsi"
     ;;
 """)
         return CommandLineEvaluation()
 
+
+    def go_HandleInitialModuleSetup(self):
+
+        class HandleInitialModuleSetup:
+
+            def output(self, ofile):
+                ofile.write("""
+if check_bv "iscsi"; then
+  logp "Handling iSCSI"
+  modprobe sd_mod
+  modprobe iscsi_tcp
+fi
+""")
+        return HandleInitialModuleSetup()
 
     def go_SetupHighLevelTransport(self):
 
@@ -45,10 +57,8 @@ class iSCSI(object):
 
             def output(self, ofile):
                 ofile.write("""
-if [ "${boot_type}" = "iscsi" ]; then
-  logp "Setting up iSCSI"
-  modprobe -q sd_mod
-  modprobe -q iscsi_tcp
+iscsi:*)
+  logp "Starting up iSCSI"
   eval ${boot_args}
   maybe_break iscsi
 
@@ -115,10 +125,9 @@ EOF
     iscsiadm -m node -L automatic
   fi
   logpe
-fi
+;;
 """)
         return SetupHighLevelTransport()
-
 
     def go_PrepareRootDir(self):
 

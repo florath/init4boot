@@ -133,7 +133,6 @@ class HandlePlugins(BaseLogger):
         while os.path.islink(tsource):
             res = os.readlink(tsource)
             tsource_orig = tsource
-            self.log_error("RRRR %s %s" % (tsource, res))
             if res[0] == "/":
                 res = res[1:]
                 tsource = os.path.join(self.opts.root_dir, res)

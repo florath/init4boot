@@ -20,21 +20,32 @@ class lvm2(object):
     def check(self):
         return fsutils.must_exist(self.__root_dir, ["sbin"], "lvm")
 
-    def go_SetupHighLevelTransport(self):
+    def go_CommandLineEvaluation(self):
 
-        class SetupHighLevelTransport:
-
-            def deps(self):
-                return []
+        class CommandLineEvaluation:
 
             def output(self, ofile):
                 ofile.write("""
-if check_bv "lvm2"; then
-  logp "Setting up lvm2"
-  modprobe -q dm-mod
-  modprobe -q dm-snapshot
-  modprobe -q dm-mirror
-  maybe_break lvm2
+  lvm:*)
+    bv_deps="${bv_deps} lvm"
+    ;;
+""")
+        return CommandLineEvaluation()
+
+    def go_HandleInitialModuleSetup(self):
+
+        class HandleInitialModuleSetup:
+
+            def output(self, ofile):
+                ofile.write("""
+if check_bv "lvm"; then
+  logp "Handling LVM"
+  modprobe dm-mod
+  modprobe dm-snapshot
+  modprobe dm-mirror
+fi
+""")
+        return HandleInitialModuleSetup()
 
   #log "Running lvm2 vgchange"
   ## Split volume group from logical volume.
@@ -45,15 +56,23 @@ if check_bv "lvm2"; then
   #lvm vgchange -aly --ignorelockingfailure ${vg}
   #lvm vgchange -aly --ignorelockingfailure
 
-  lvm2_scan()
-  {
+    def go_SetupHighLevelTransport(self):
+
+        class SetupHighLevelTransport:
+
+            def output(self, ofile):
+                ofile.write("""
+lvm:*)
+  logp "Setting up lvm2"
+  maybe_break lvm2
+  params=$(echo ${transform#lvm:} | tr "," " ")
+  if test ${params} = "scan"; then
     lvm pvscan
     lvm vgscan
     lvm vgchange -aly --ignorelockingfailure
     lvm lvscan
-  }
-fi
-
+  fi
+  ;;
 """)
         return SetupHighLevelTransport()
 

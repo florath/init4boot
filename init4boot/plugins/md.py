@@ -20,24 +20,20 @@ class md(object):
     def check(self):
         return fsutils.must_exist(self.__root_dir, ["sbin"], "mdadm")
 
-    def go_SetupHighLevelTransport(self):
+    def go_HandleInitialModuleSetup(self):
 
-        class SetupHighLevelTransport:
-
-            def deps(self):
-                return ["multipath", "lvm2"]
+        class HandleInitialModuleSetup:
 
             def output(self, ofile):
                 ofile.write("""
 if check_bv "md"; then
-  logp "Setting up md"
+  logp "Handling md"
   log "Loading md modules"
   MD_MODULES="linear multipath raid0 raid1 raid456 raid10"
   for m in ${MD_MODULES};
   do
     modprobe -q $m
   done
-  maybe_break md
 
   if [ ! -f /proc/mdstat ]; then
     panic "Cannot initialise md subsystem (/proc/mdstat missing)"
@@ -51,24 +47,41 @@ if check_bv "md"; then
 
   # prevent writes/syncs so that resuming works (#415441).
   echo 1 > /sys/module/md_mod/parameters/start_ro
-
-  md_scan()
-  {
-    mdadm --examine --scan >> $CONFIG
-    log "Assembling all md arrays"
-
-    if mdadm --assemble --scan --run --auto=yes $extra_args; then
-      log "assembled all arrays."
-    else
-      log "failed to assemble all arrays."
-    fi
-
-    if [ -x "$(command -v udevsettle)" ]; then
-      log "Waiting for udev to process events"
-      udevsettle 10
-    fi
-  }
 fi
+""")
+        return HandleInitialModuleSetup()
+
+    def go_SetupHighLevelTransport(self):
+
+        class SetupHighLevelTransport:
+
+            def deps(self):
+                return []
+
+            def output(self, ofile):
+                ofile.write("""
+md:*)
+  logp "Setting up md"
+  maybe_break md
+  panic "TODO: use lvm2md.py"
+
+  #md_scan()
+  #{
+  #  mdadm --examine --scan >> $CONFIG
+  #  log "Assembling all md arrays"
+  #
+  #  if mdadm --assemble --scan --run --auto=yes $extra_args; then
+  #    log "assembled all arrays."
+  #  else
+  #    log "failed to assemble all arrays."
+  #  fi
+  #
+  #  if [ -x "$(command -v udevsettle)" ]; then
+  #    log "Waiting for udev to process events"
+  #    udevsettle 10
+  #  fi
+  #}
+;;
 
 """)
         return SetupHighLevelTransport()

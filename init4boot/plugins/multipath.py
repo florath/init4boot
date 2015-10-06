@@ -21,6 +21,31 @@ class multipath(object):
         return fsutils.must_exist(self.__root_dir, ["sbin"], "multipath") \
             and fsutils.must_exist(self.__root_dir, ["sbin"], "kpartx")
 
+    def go_CommandLineEvaluation(self):
+
+        class CommandLineEvaluation:
+            def output(self, ofile):
+                ofile.write("""
+  multipath:*)
+    bv_deps="${bv_deps} network multipath"
+    ;;
+""")
+        return CommandLineEvaluation()
+
+    def go_HandleInitialModuleSetup(self):
+
+        class HandleInitialModuleSetup:
+
+            def output(self, ofile):
+                ofile.write("""
+if check_bv "multipath"; then
+  logp "Handling multipath"
+  modprobe dm-multipath
+  modprobe dm-emc
+  modprobe dm-round-robin
+fi
+""")
+        return HandleInitialModuleSetup()
     def go_SetupHighLevelTransport(self):
 
         class SetupHighLevelTransport:
@@ -31,15 +56,11 @@ class multipath(object):
 
             def output(self, ofile):
                 ofile.write("""
-if check_bv "multipath"; then
+multipath:*)
   maybe_break multipath
   logp "Handling multipath"
 
   if [ -e /bin/multipath ]; then
-
-    modprobe dm-multipath
-    modprobe dm-emc
-    modprobe dm-round-robin
 
     # Multipath needs in some situations more than one run
     for i in 1 2 3 ; do
@@ -73,21 +94,10 @@ if check_bv "multipath"; then
   fi
 
   logpe
-fi
+;;                
 """)
         return SetupHighLevelTransport()
     
-    def go_CommandLineEvaluation(self):
-
-        class CommandLineEvaluation:
-            def cleanup(self, ofile):
-                ofile.write("""
-if check_bv "multipath" ; then
-   clp_bv="${clp_bv} udev"
-   log "Adding boot variant udev which is needed for multipath"
-fi
-""")
-        return CommandLineEvaluation()
 
 
 # ======================================================================

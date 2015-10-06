@@ -25,6 +25,8 @@ implementations handle this in a different way.
   longer. 
 
 # HowTo
+
+## Creating
 To create an initramfs, call the 'i4b-mkinitramfs' with the options:
 
 * -o <initramfs>: the output file name
@@ -40,6 +42,20 @@ following directories must be copied over (or must be able to access):
 Note: It is very important, that there must no link to the outer
 world, e. g. lib -> /lib64.  In this case the wrong files (from the
 build host) will be used.
+
+## Usage
+To use the initrd created by init4boot, there is the need to adapt the
+boot kernel parameters.  The location of the parameters are highly
+dependend which boot program you are using.
+
+When you are using grub, you can find the kernel parameters typically
+in the file */boot/grub/grub.cfg*. Have a look for menuentry and there
+for linux.
+
+When you are using 'Das U-Boot' for embedded systems (like Raspberry
+Pi 2), the parameters are in the u-boot configuration file, like
+*/boot/boot.cfg* or */boot/firmware/boot.cfg*.
+Do not forget to call the mkimage after changing this file.
 
 # Known to Run
 This is a list of all systems where init4boot is known to work:

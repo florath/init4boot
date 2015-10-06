@@ -28,7 +28,7 @@ class lvm2md(object):
         return fsutils.must_exist(self.__root_dir, ["sbin"], "mdadm") \
             and fsutils.must_exist(self.__root_dir, ["sbin"], "lvm")
 
-    def go_SetupHighLevelTransport(self):
+    def NO_go_SetupHighLevelTransport(self):
 
         class SetupHighLevelTransport:
 

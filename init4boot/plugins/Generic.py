@@ -53,7 +53,7 @@ clp_use_std_mount="1"
 log()
 {
   [ "${verbose}" = "0" ] && return
-  d=`date +"[%Y-%m-%d %H:%M:%S %Z]"`
+  d=$(date +"[%Y-%m-%d %H:%M:%S %Z]")
   echo ${d} init4boot "$@"
 }
 phasecnt=0
@@ -143,10 +143,10 @@ for x in $(cat /proc/cmdline); do
            clp_break=${x#break=}
            ;;
     bv=*)
-           clp_bv=`echo ${x#bv=} | tr "," " "`
+           clp_bv=$(echo ${x#bv=} | tr "," " ")
            ;;
     debug=*)
-           clp_debug=`istrue ${x#debug=}`
+           clp_debug=$(istrue ${x#debug=})
            ;;
     hostid=*)
            clp_hostid=${x#hostid=}
@@ -164,7 +164,7 @@ for x in $(cat /proc/cmdline); do
            clp_rfs=${x#rfs=}
            ;;
     verbose=*)
-           clp_verbose=`istrue ${x#verbose=}`
+           clp_verbose=$(istrue ${x#verbose=})
            ;;
 """)
                 
@@ -214,7 +214,7 @@ maybe_break InitialSystemSetup
 [ -d /tmp ] || mkdir /tmp
 mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid none /sys 
-mount -t tmpfs -o size=10M,mode=0755 udev /dev
+mount -t devtmpfs -o size=10M,mode=0755 udev /dev
 [ -e /dev/console ] || mknod /dev/console c 5 1
 [ -e /dev/null ] || mknod /dev/null c 1 3
 """)
@@ -234,15 +234,19 @@ maybe_break CommandLineEvaluation
 
             def pre_output(self, ofile):
                 ofile.write("""
-case ${clp_rfs} in
+for transform in $(echo ${clp_rfs} | tr ";" " ");
+do
+case ${transform} in
 """)
 
             def post_output(self, ofile):
                 ofile.write("""
   *)
-    log "Ignoring unknown boot type '${clp_rfs}'"
+    panic "CommandLineEvaluation: Unknown transformation '${transform}'"
     ;;
 esac
+done
+
 # Append additional (automatic generated) dependencies
 clp_bv="${clp_bv} ${bv_deps}"
 log "Boot variant(s) (manual plus automatic): '${clp_bv}'"
@@ -262,7 +266,7 @@ maybe_break HandleInitialModuleSetup
             def pre_output(self, ofile):
                 ofile.write("""
 depmod -a
-for mod in `echo ${clp_loadmods} | tr "," " "`;
+for mod in $(echo ${clp_loadmods} | tr "," " ");
 do
     log "Pre-loading module '${mod}'"
     modprobe $mod
@@ -270,6 +274,25 @@ done
 """)
                 
         return HandleInitialModuleSetup()
+
+    def go_SetupHighLevelTransport(self):
+
+        class SetupHighLevelTransport:
+            def pre_output(self, ofile):
+                ofile.write("""
+for transform in $(echo ${clp_rfs} | tr ";" " ");
+do
+case ${transform} in
+""")
+            def post_output(self, ofile):
+                ofile.write("""
+  *)
+    log "SetupHighLevelTransport: Ignoring unknown transformation '${transform}'"
+    ;;
+esac
+done
+""")    
+        return SetupHighLevelTransport()
 
     def go_MountRoot(self):
 
@@ -356,7 +379,7 @@ fi
 
 # Search for valid init
 if [ -z "${init}" ] ; then
-        for init in /sbin/init /etc/init /bin/init /bin/sh; do
+        for init in /lib/systemd/systemd /sbin/init /etc/init /bin/init /bin/sh; do
                 if [ ! -x "${rootmnt}${init}" ]; then
                         continue
                 fi
