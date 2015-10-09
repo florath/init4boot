@@ -85,7 +85,6 @@ panic()
   [ -n "${1}" ] && echo "PANIC: ${1}"
   PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
-panic
 # Parameter: device node to check
 # Echos fstype to stdout
 # Return value: indicates if an fs could be recognized
