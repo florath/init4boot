@@ -564,8 +564,8 @@ panic "Could not execute run-init."
 
             def output(self, c):
                 self.log_info("Creating cpio archive")
-                os.system("P=$PWD && cd %s &&  find . | " \
-                          "cpio --quiet -o -H newc | gzip >$P/%s"
+                os.system("cd %s &&  find . | " \
+                          "cpio --quiet -o -H newc | gzip >%s"
                           % (c.tmpdir, self.opts.output_file))
 
         return Create(self.opts)
