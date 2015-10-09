@@ -214,6 +214,8 @@ maybe_break InitialSystemSetup
 mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid none /sys 
 mount -t devtmpfs -o size=10M,mode=0755 udev /dev
+mkdir -p /dev/pts
+mount -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts
 [ -e /dev/console ] || mknod /dev/console c 5 1
 [ -e /dev/null ] || mknod /dev/null c 1 3
 """)
