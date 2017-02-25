@@ -4,12 +4,14 @@
 # Handle loading of plugins
 #
 # (c) 2008 by flonatel
+# (c) 2017 by Andreas Florath (andreas@florath.net)
 #
 # For licensing details see COPYING
 #
 
 import os
 import traceback
+import sys
 from init4boot.lib.TopologicalSort import topological_sort
 from init4boot.lib.BaseLogger import BaseLogger
 

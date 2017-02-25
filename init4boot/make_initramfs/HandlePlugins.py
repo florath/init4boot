@@ -105,6 +105,10 @@ class HandlePlugins(BaseLogger):
         else:
             print "+++ Ignoging non-existant file='%s'" % sourcepath
 
+    def exists(self, source):
+        sourcepath = os.path.join(self.opts.root_dir, source)
+        return os.path.exists(sourcepath)
+
     def copytree(self, src, dst, regexp=".*"):
         fre = re.compile(regexp)
         names = os.listdir(os.path.join(self.opts.root_dir, src))

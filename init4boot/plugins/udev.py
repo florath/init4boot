@@ -100,7 +100,11 @@ fi
                 # XXX Not existsing : c.copy("etc/scsi_id.config", "etc")
                 # WHY: rm -f $DESTDIR/etc/udev/rules.d/*_cd-aliases-generator.rules
                 c.log("Copy used binaries")
-                c.copy_exec("sbin/udevd")
+                if c.exists("sbin/udevd"):
+                    c.copy_exec("sbin/udevd")
+                elif c.exists("lib/systemd/systemd-udevd"):
+                    c.copy_exec("lib/systemd/systemd-udevd")
+                    c.ln("bin/systemd-udevd", "bin/udevd")
                 c.copy_exec("sbin/udevadm")
 
                 # Group is needed to not get
